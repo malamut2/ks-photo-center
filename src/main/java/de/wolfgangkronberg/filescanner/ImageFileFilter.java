@@ -2,7 +2,6 @@ package de.wolfgangkronberg.filescanner;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FilenameFilter;
 import java.util.Set;
 
 public class ImageFileFilter implements FileFilter {

@@ -14,7 +14,7 @@ import javafx.stage.Stage;
 import java.util.List;
 
 /**
- * This is the single JavaFX application itself. All initializations and diyplay originates from here.
+ * This is the single JavaFX application itself. All initializations and display originates from here.
  */
 public class App extends Application {
 
@@ -35,7 +35,7 @@ public class App extends Application {
         stage.setFullScreenExitHint("");
         stage.setFullScreen(true);
         stage.show();
-        navigator.init(props, stage, pane, currentPictureName);
+        navigator.init(props, pane, currentPictureName);
     }
 
     @Override

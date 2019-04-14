@@ -4,6 +4,7 @@ import de.wolfgangkronberg.filescanner.FileScanner;
 import de.wolfgangkronberg.filescanner.SimpleAlphabeticalFileScanner;
 
 import java.io.File;
+import java.util.List;
 
 public class FileSequence {
 
@@ -36,4 +37,14 @@ public class FileSequence {
     public void reload(Runnable callback) {
         fileScanner.reload(callback);
     }
+
+    public List<File> getNext(int num) {
+        return fileScanner.getNext(num);
+    }
+
+    public List<File> getPrevious(int num) {
+        return fileScanner.getPrevious(num);
+    }
+
+
 }

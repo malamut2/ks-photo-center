@@ -3,6 +3,7 @@ package de.wolfgangkronberg.filescanner;
 import java.io.File;
 import java.text.Collator;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class SimpleAlphabeticalFileScanner implements FileScanner {
@@ -61,12 +62,18 @@ public class SimpleAlphabeticalFileScanner implements FileScanner {
 
     @Override
     public List<File> getNext(int num) {
-        return null;  // !kgb
+        synchronized (lock) {
+            int to = Math.min(cursor + num, files.length);
+            return Collections.unmodifiableList(Arrays.asList(files).subList(cursor, to));
+        }
     }
 
     @Override
     public List<File> getPrevious(int num) {
-        return null;  // !kgb
+        synchronized (lock) {
+            int from = Math.max(0, cursor - num);
+            return Collections.unmodifiableList(Arrays.asList(files).subList(from, cursor));
+        }
     }
 
     // caller must synchronize on lock

@@ -22,7 +22,7 @@ public class KeyEventHandler implements EventHandler<KeyEvent> {
         if (code == RIGHT) {
             navigator.switchToNextPicture();
         } else if (code == LEFT) {
-            navigator.switchToPreviousPicture();;
+            navigator.switchToPreviousPicture();
         } else if (code == F5) {
             navigator.reloadImages();
         }

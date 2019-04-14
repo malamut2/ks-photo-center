@@ -1,13 +1,12 @@
 package de.wolfgangkronberg;
 
 import javafx.beans.value.ChangeListener;
-import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Font;
-import javafx.stage.Stage;
 
 import java.io.File;
 
@@ -26,11 +25,10 @@ public class Navigator {
     /**
      * Initialized the Navigator by setting the initial picture which shall be viewed.
      * @param props the currently active application properties
-     * @param stage a stage which is currently showing full screen
      * @param pane the pane in which the image shall be displayed
      * @param pictureInitiallyViewed the path/name of the picture to be viewed, or null if just the newest picture
      */
-    public void init(AppProperties props, Stage stage, StackPane pane, String pictureInitiallyViewed) {
+    public void init(AppProperties props, StackPane pane, String pictureInitiallyViewed) {
 
         this.pane = pane;
         paneHeight = pane.getHeight();
@@ -48,11 +46,14 @@ public class Navigator {
                 current == null ? props.getDefaultNavStrategy() : props.getOpenFileNavStrategy(), current);
 
         Label imagePlaceholder = new Label("");
+        BorderPane bp1 = new BorderPane();
+        BorderPane bp2 = new BorderPane();
         message = new Label("");
-        message.setAlignment(Pos.BOTTOM_CENTER);
         message.setFont(Font.font(40));
-        message.setStyle("-fx-text-fill: #f0f0f0; -fx-background-radius: 15; -fx-background-color: #00000080; -fx-background-insets: -5 -10;");
-        pane.getChildren().addAll(imagePlaceholder, message);
+        message.setStyle("-fx-text-fill: #f0f0f0; -fx-background-radius: 15; -fx-background-color: #30303080; -fx-background-insets: 15 10; -fx-label-padding: 20;");
+        bp1.setRight(bp2);
+        bp2.setBottom(message);
+        pane.getChildren().addAll(imagePlaceholder, bp1);
         if (pictureInitiallyViewed == null) {
             message.setText("Library Mode is not implemented yet.");
         } else {

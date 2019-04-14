@@ -12,7 +12,7 @@ public enum NavigationStrategy {
     LibraryByTimeFlat(true, false, true),
     LibraryByTimePerDir(true, false, false);
 
-    private NavigationStrategy(boolean library, boolean alphabetical, boolean traverseAcrossDirs) {
+    NavigationStrategy(boolean library, boolean alphabetical, boolean traverseAcrossDirs) {
         this.library = library;
         this.alphabetical = alphabetical;
         this.traverseAcrossDirs = traverseAcrossDirs;
