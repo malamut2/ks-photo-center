@@ -1,10 +1,12 @@
 package de.wolfgangkronberg;
 
 import javafx.beans.value.ChangeListener;
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import java.io.File;
@@ -15,6 +17,7 @@ import java.io.File;
 public class Navigator {
 
     private StackPane pane;
+    private Label message;
     private double paneHeight;
     private double paneWidth;
 
@@ -44,10 +47,14 @@ public class Navigator {
         files = new FileSequence(props,
                 current == null ? props.getDefaultNavStrategy() : props.getOpenFileNavStrategy(), current);
 
-        pane.getChildren().add(new Label(""));  // placeholder for future image
+        Label imagePlaceholder = new Label("");
+        message = new Label("");
+        message.setAlignment(Pos.BOTTOM_CENTER);
+        message.setFont(Font.font(40));
+        message.setStyle("-fx-text-fill: #f0f0f0; -fx-background-radius: 15; -fx-background-color: #00000080; -fx-background-insets: -5 -10;");
+        pane.getChildren().addAll(imagePlaceholder, message);
         if (pictureInitiallyViewed == null) {
-            Label l = new Label("Library Mode is not implemented yet.");
-            pane.getChildren().add(l);
+            message.setText("Library Mode is not implemented yet.");
         } else {
             displayImage(current);
         }
@@ -56,8 +63,7 @@ public class Navigator {
     private void displayImage(File current) {
         Image image = new Image(current.toURI().toString());
         if (image.getHeight() == 0) {
-            Label l = new Label("Cannot find or display picture: " + current.getAbsolutePath());
-            pane.getChildren().add(l);
+            message.setText("Cannot find or display picture: " + current.getAbsolutePath());
             return;
         }
         ImageView iv = new ImageView(image);
@@ -75,17 +81,21 @@ public class Navigator {
 
     public void switchToNextPicture() {
         if (!files.moveToNext()) {
-            // !kgb display info: no next picture available
+            message.setText("This is the last image.");
+            message.setVisible(true);
             return;
         }
+        message.setVisible(false);
         displayImage(files.getCurrent());
     }
 
     public void switchToPreviousPicture() {
         if (!files.moveToPrevious()) {
-            // !kgb display info: no next picture available
+            message.setText("This is the first image.");
+            message.setVisible(true);
             return;
         }
+        message.setVisible(false);
         displayImage(files.getCurrent());
     }
 
