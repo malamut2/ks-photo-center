@@ -2,3 +2,6 @@
 *.iml
 *.ipr
 *.iws
+
+# Generated on build
+target/
