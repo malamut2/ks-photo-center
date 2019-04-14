@@ -22,7 +22,7 @@ public class Navigator {
     /**
      * Initialized the Navigator by setting the initial picture which shall be viewed.
      * @param props the currently active application properties
-     * @param fullScreenStage a stage which is currently showning full screen
+     * @param fullScreenStage a stage which is currently showing full screen
      * @param pane the pane in which the image shall be displayed
      * @param pictureInitiallyViewed the path/name of the picture to be viewed, or null if just the newest picture
      */
@@ -32,8 +32,10 @@ public class Navigator {
         fullScreenHeight = fullScreenStage.getHeight();
         fullScreenWidth = fullScreenStage.getWidth();
         File current = pictureInitiallyViewed == null ? null : new File(pictureInitiallyViewed);
-        files = new FileSequence(props, props.getDefaultNavStrategy(), current);
+        files = new FileSequence(props,
+                current == null ? props.getDefaultNavStrategy() : props.getOpenFileNavStrategy(), current);
 
+        pane.getChildren().add(new Label(""));  // placeholder for future image
         if (pictureInitiallyViewed == null) {
             Label l = new Label("Library Mode is not implemented yet.");
             pane.getChildren().add(l);
@@ -53,7 +55,7 @@ public class Navigator {
         double factor = getFullScreenScale(image);
         iv.setScaleX(factor);
         iv.setScaleY(factor);
-        pane.getChildren().setAll(iv);
+        pane.getChildren().set(0, iv);
     }
 
     private double getFullScreenScale(Image image) {
@@ -79,7 +81,6 @@ public class Navigator {
     }
 
     public void reloadImages() {
-        files.reload();
-        displayImage(files.getCurrent());
+        files.reload(() -> displayImage(files.getCurrent()));
     }
 }
