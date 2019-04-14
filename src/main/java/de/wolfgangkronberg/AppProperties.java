@@ -2,6 +2,7 @@ package de.wolfgangkronberg;
 
 import lombok.Data;
 
+import java.awt.*;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -42,6 +43,16 @@ public class AppProperties {
      * current image is not in the library, but a library-type strategy is chosen
      */
     private NavigationStrategy failoverNavStrategy = NavigationStrategy.TraverseTreeAlphabetical;
+
+    /**
+     * The width of the main window on startup, in pixels
+     */
+    private double width = Toolkit.getDefaultToolkit().getScreenSize().getWidth() * 0.9;
+
+    /**
+     * The height of the main window on startup, in pixels
+     */
+    private double height = Toolkit.getDefaultToolkit().getScreenSize().getHeight() * 0.9;
 
     public void loadParameters(Map<String, String> cmdLine) {
         Map<String, String> newProps = new HashMap<>(cmdLine);
@@ -95,9 +106,17 @@ public class AppProperties {
             return new File(value);
         } else if (type == NavigationStrategy.class) {
             return NavigationStrategy.valueOf(value);  // throws IllegalArgumentException on invalid value
+        } else if (type == Double.TYPE) {
+            return Integer.valueOf(value);  // throws NumberFormatException, which inherits from IllegalArgumentException
         } else {
             throw new RuntimeException("Internal error: unknown AppProperties type: " + type.getName());
         }
     }
 
+    /**
+     * Hook to possibly save some settings on exit under some conditions
+     */
+    public void saveSelectedOnExit() {
+        // we do not perform any settings save on exit for now
+    }
 }

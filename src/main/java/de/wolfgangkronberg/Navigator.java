@@ -1,5 +1,6 @@
 package de.wolfgangkronberg;
 
+import javafx.beans.value.ChangeListener;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -14,23 +15,31 @@ import java.io.File;
 public class Navigator {
 
     private StackPane pane;
-    private double fullScreenHeight;
-    private double fullScreenWidth;
+    private double paneHeight;
+    private double paneWidth;
 
     private FileSequence files;
 
     /**
      * Initialized the Navigator by setting the initial picture which shall be viewed.
      * @param props the currently active application properties
-     * @param fullScreenStage a stage which is currently showing full screen
+     * @param stage a stage which is currently showing full screen
      * @param pane the pane in which the image shall be displayed
      * @param pictureInitiallyViewed the path/name of the picture to be viewed, or null if just the newest picture
      */
-    public void init(AppProperties props, Stage fullScreenStage, StackPane pane, String pictureInitiallyViewed) {
+    public void init(AppProperties props, Stage stage, StackPane pane, String pictureInitiallyViewed) {
 
         this.pane = pane;
-        fullScreenHeight = fullScreenStage.getHeight();
-        fullScreenWidth = fullScreenStage.getWidth();
+        paneHeight = pane.getHeight();
+        paneWidth = pane.getWidth();
+        ChangeListener<Number> paneSizeListener = (observable, oldValue, newValue) -> {
+            paneHeight = pane.getHeight();
+            paneWidth = pane.getWidth();
+            reloadLocal();
+        };
+        pane.widthProperty().addListener(paneSizeListener);
+        pane.heightProperty().addListener(paneSizeListener);
+
         File current = pictureInitiallyViewed == null ? null : new File(pictureInitiallyViewed);
         files = new FileSequence(props,
                 current == null ? props.getDefaultNavStrategy() : props.getOpenFileNavStrategy(), current);
@@ -59,8 +68,8 @@ public class Navigator {
     }
 
     private double getFullScreenScale(Image image) {
-        double scale1 = fullScreenHeight / image.getHeight();
-        double scale2 = fullScreenWidth / image.getWidth();
+        double scale1 = paneHeight / image.getHeight();
+        double scale2 = paneWidth / image.getWidth();
         return Math.min(scale1, scale2);
     }
 
@@ -81,6 +90,10 @@ public class Navigator {
     }
 
     public void reloadImages() {
-        files.reload(() -> displayImage(files.getCurrent()));
+        files.reload(this::reloadLocal);
+    }
+
+    private void reloadLocal() {
+        displayImage(files.getCurrent());
     }
 }

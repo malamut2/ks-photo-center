@@ -29,13 +29,18 @@ public class App extends Application {
         setCommandlineParams();
         StackPane pane = new StackPane();
         pane.setBackground(new Background(new BackgroundFill(Color.BLACK, CornerRadii.EMPTY, Insets.EMPTY)));
-        Scene scene = new Scene(pane, 640, 480);
+        Scene scene = new Scene(pane, props.getWidth(), props.getHeight());
         scene.addEventHandler(KeyEvent.KEY_PRESSED, keyEventHandler);
         stage.setScene(scene);
         stage.setFullScreenExitHint("");
         stage.setFullScreen(true);
         stage.show();
         navigator.init(props, stage, pane, currentPictureName);
+    }
+
+    @Override
+    public void stop() {
+        props.saveSelectedOnExit();
     }
 
     private void setCommandlineParams() {
