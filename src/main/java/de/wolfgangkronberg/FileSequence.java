@@ -11,7 +11,7 @@ public class FileSequence {
     private final FileScanner fileScanner;
 
     public FileSequence(AppProperties props, NavigationStrategy navStrategy, File startingPoint) {
-        int fileScanSize = 1000;  // !kgb take from props: how far should we look into past/future?
+        int fileScanSize = props.getNumTraverseFiles();
         switch (navStrategy) {
             case CurrentDirAlphabetical:
                 fileScanner = new SimpleAlphabeticalFileScanner(startingPoint);

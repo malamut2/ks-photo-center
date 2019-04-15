@@ -54,6 +54,22 @@ public class AppProperties {
      */
     private double height = Toolkit.getDefaultToolkit().getScreenSize().getHeight() * 0.9;
 
+    /**
+     * The number of images before and after the current image which shall be prefetched for faster display
+     */
+    private int numPrefetchAroundCurrent = 10;
+
+    /**
+     * The number of images previously shown which should stay in the cache
+     */
+    private int numCacheShownImages = 10;
+
+    /**
+     * The minimum number of files before and after the currently displayed file
+     * which will be stored as reference when traversing a tree
+     */
+    private int numTraverseFiles = 1000;
+
     public void loadParameters(Map<String, String> cmdLine) {
         Map<String, String> newProps = new HashMap<>(cmdLine);
         String settingsFile = newProps.remove("props");
