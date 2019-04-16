@@ -1,20 +1,14 @@
 package de.wolfgangkronberg;
 
-import com.drew.imaging.ImageMetadataReader;
-import com.drew.imaging.ImageProcessingException;
-import com.drew.metadata.Metadata;
-import com.drew.metadata.exif.ExifIFD0Directory;
 import de.wolfgangkronberg.filescanner.FileCache;
 import javafx.beans.value.ChangeListener;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Font;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -29,8 +23,8 @@ public class Navigator {
     private int numPrefetchedAroundCurrent;
 
     private FileSequence files;
-    private GroupedCacheLoader<File, Image> gCache;
-    private FileCache<Image> fCache;
+    private GroupedCacheLoader<File, ImageWithMetadata> gCache;
+    private FileCache<ImageWithMetadata> fCache;
 
     /**
      * Initialized the Navigator by setting the initial picture which shall be viewed.
@@ -45,7 +39,7 @@ public class Navigator {
         File current = pictureInitiallyViewed == null ? null : new File(pictureInitiallyViewed);
         files = new FileSequence(props,
                 current == null ? props.getDefaultNavStrategy() : props.getOpenFileNavStrategy(), current);
-        gCache = new GroupedCacheLoader<>(file -> new Image(file.toURI().toString()),
+        gCache = new GroupedCacheLoader<>(ImageWithMetadata::new,
                 3, props.getNumCacheShownImages());
         fCache = new FileCache<>(files, gCache);
 
@@ -82,9 +76,9 @@ public class Navigator {
             message.setText("No image to display.");
             return;
         }
-        Image image;
+        ImageWithMetadata iwm;
         try {
-            image = gCache.get(current).get();
+            iwm = gCache.get(current).get();
         } catch (InterruptedException e) {
             message.setText("Interrupted while loading picture: " + current.getAbsolutePath());
             return;
@@ -92,57 +86,12 @@ public class Navigator {
             message.setText("Error loading picture '" + current.getAbsolutePath() + "': " + e.toString());
             return;
         }
-        if (image.getHeight() == 0) {
+        if (!iwm.isValid()) {
             message.setText("Cannot find or display picture: " + current.getAbsolutePath());
             return;
         }
-        Metadata metadata = getMetadata(current);
-        int rotate = getRotation(metadata);
-        ImageView iv = new ImageView(image);
-        iv.setRotate(rotate);
-        double factor = getFullScreenScale(image, rotate);
-        iv.setScaleX(factor);
-        iv.setScaleY(factor);
+        ImageView iv = iwm.getImageView(paneWidth, paneHeight);
         pane.getChildren().set(0, iv);
-    }
-
-    private int getRotation(Metadata metadata) {
-        if (metadata == null) {
-            return 0;
-        }
-        ExifIFD0Directory directory = metadata.getFirstDirectoryOfType(ExifIFD0Directory.class);
-        if (directory == null) {
-            return 0;
-        }
-        Integer orientation = directory.getInteger(274);
-        if (orientation == null) {
-            return 0;
-        }
-        switch (orientation) {
-            case 8:
-                return 270;
-            case 3:
-                return 180;
-            case 6:
-                return 90;
-            default:
-                return 0;
-        }
-    }
-
-    private Metadata getMetadata(File current) {
-        try {
-            return ImageMetadataReader.readMetadata(current);
-        } catch (ImageProcessingException | IOException e) {
-            return null;
-        }
-    }
-
-    private double getFullScreenScale(Image image, int rotate) {
-        boolean tipped = rotate == 90 || rotate == 270;
-        double scale1 = paneHeight / (tipped ? image.getWidth() : image.getHeight());
-        double scale2 = paneWidth / (tipped ? image.getHeight() : image.getWidth());
-        return Math.min(scale1, scale2);
     }
 
     public void switchToNextPicture() {
