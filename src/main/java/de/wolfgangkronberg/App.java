@@ -11,6 +11,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -26,13 +27,23 @@ public class App extends Application {
     @Override
     public void start(Stage stage) {
         setCommandlineParams();
+        File current = currentPictureName == null ? null : new File(currentPictureName);
+        ge.setCurrentImage(current);
         stage.setTitle("ksPhotoCenter");
         ge.setStage(stage);
         ge.setMainPane(createMainPane(stage));
         ge.setImagePane(createImagePane());
         ge.setImagePaneMessage(new TimedMessage(Pos.BOTTOM_RIGHT));
         ge.getImagePane().getChildren().add(ge.getImagePaneMessage().getRoot());
-        ge.getNavigator().init(currentPictureName);
+        ge.setApplicationLayout(createApplicationLayout());
+        ge.getNavigator().init();
+        stage.show();
+    }
+
+    private ApplicationLayout createApplicationLayout() {
+        ApplicationLayout.State state = ge.getCurrentImage() == null ?
+                ApplicationLayout.State.thumbnail : ApplicationLayout.State.imageOnly;
+        return new ApplicationLayout(ge, state);
     }
 
     @Override
@@ -50,14 +61,11 @@ public class App extends Application {
         stage.setFullScreenExitHint("");
         stage.setFullScreen(true);
         stage.setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
-        stage.show();
         return result;
     }
 
     private Pane createImagePane() {
-        Pane main = ge.getMainPane();
         StackPane result = new StackPane();
-        main.getChildren().setAll(result);
         Label imagePlaceholder = new Label("");
         result.getChildren().add(imagePlaceholder);
         return result;

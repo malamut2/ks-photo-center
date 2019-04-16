@@ -47,4 +47,7 @@ public class FileSequence {
     }
 
 
+    public void setCurrent(File newFile) {
+        fileScanner.setCurrent(newFile);
+    }
 }

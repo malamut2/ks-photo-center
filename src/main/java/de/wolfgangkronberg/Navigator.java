@@ -30,15 +30,13 @@ public class Navigator {
 
     /**
      * Initialized the Navigator by setting the initial picture which shall be viewed.
-     *
-     * @param pictureInitiallyViewed the path/name of the picture to be viewed, or null if just the newest picture
      */
-    public void init(String pictureInitiallyViewed) {
+    public void init() {
         AppProperties props = ge.getProps();
+        File current = ge.getCurrentImage();
         pane = ge.getImagePane();
         message = ge.getImagePaneMessage();
         numPrefetchedAroundCurrent = props.getNumPrefetchAroundCurrent();
-        File current = pictureInitiallyViewed == null ? null : new File(pictureInitiallyViewed);
         files = new FileSequence(props,
                 current == null ? props.getDefaultNavStrategy() : props.getOpenFileNavStrategy(), current);
         gCache = new GroupedCacheLoader<>(ImageWithMetadata::new,
@@ -56,35 +54,14 @@ public class Navigator {
         parent.widthProperty().addListener(paneSizeListener);
         parent.heightProperty().addListener(paneSizeListener);
 
-        if (pictureInitiallyViewed == null) {
-            message.play("Library Mode is not implemented yet.");
-        } else {
+        if (current != null) {
             displayImage();
         }
     }
 
-    private void displayImage() {
-        File current = fCache.prefetch("displayed", numPrefetchedAroundCurrent);
-        if (current == null) {
-            message.play("No image to display.");
-            return;
-        }
-        ImageWithMetadata iwm;
-        try {
-            iwm = gCache.get(current).get();
-        } catch (InterruptedException e) {
-            message.play("Interrupted while loading picture: " + current.getAbsolutePath());
-            return;
-        } catch (ExecutionException e) {
-            message.play("Error loading picture '" + current.getAbsolutePath() + "': " + e.toString());
-            return;
-        }
-        if (!iwm.isValid()) {
-            message.play("Cannot find or display picture: " + current.getAbsolutePath());
-            return;
-        }
-        ImageView iv = iwm.getImageView(paneWidth, paneHeight);
-        pane.getChildren().set(0, iv);
+    public void switchToPicture(File newPicture) {
+        fCache.setCurrent(newPicture);
+        displayImage();
     }
 
     public void switchToNextPicture() {
@@ -110,4 +87,30 @@ public class Navigator {
     private void reloadLocal() {
         displayImage();
     }
+
+    private void displayImage() {
+        File current = fCache.prefetch("displayed", numPrefetchedAroundCurrent);
+        if (current == null) {
+            message.play("No image to display.");
+            return;
+        }
+        ImageWithMetadata iwm;
+        try {
+            iwm = gCache.get(current).get();
+        } catch (InterruptedException e) {
+            message.play("Interrupted while loading picture: " + current.getAbsolutePath());
+            return;
+        } catch (ExecutionException e) {
+            message.play("Error loading picture '" + current.getAbsolutePath() + "': " + e.toString());
+            return;
+        }
+        if (!iwm.isValid()) {
+            message.play("Cannot find or display picture: " + current.getAbsolutePath());
+            return;
+        }
+        ge.setCurrentImage(current);
+        ImageView iv = iwm.getImageView(paneWidth, paneHeight);
+        pane.getChildren().set(0, iv);
+    }
+
 }

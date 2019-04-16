@@ -39,4 +39,7 @@ public class FileCache<T> {
     }
 
 
+    public void setCurrent(File newFile) {
+        files.setCurrent(newFile);
+    }
 }

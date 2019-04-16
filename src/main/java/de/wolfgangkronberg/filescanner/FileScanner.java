@@ -12,5 +12,6 @@ public interface FileScanner {
     void reload(Runnable callback);
     List<File> getNext(int num);
     List<File> getPrevious(int num);
+    void setCurrent(File newFile);
 
 }

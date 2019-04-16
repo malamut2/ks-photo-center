@@ -1,5 +1,6 @@
 package de.wolfgangkronberg;
 
+import de.wolfgangkronberg.edit.EditAction;
 import javafx.event.EventHandler;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -28,7 +29,31 @@ public class KeyEventHandler implements EventHandler<KeyEvent> {
             ge.getNavigator().reloadImages();
         } else if (code == F) {
             ge.getStage().setFullScreen(!ge.getStage().isFullScreen());
+        } else if (code == ESCAPE) {
+            handleEscape();
+        } else if (code == ENTER) {
+            handleEnter();
         }
+    }
+
+    private void handleEnter() {
+        EditAction editAction = ge.getEditActionStack().pollLast();
+        if (editAction != null) {
+            editAction.confirm();
+            return;
+        }
+        if (!ge.getApplicationLayout().enter()) {
+            ge.getCentralPaneMessage().play("No image has been selected for display");
+        }
+    }
+
+    private void handleEscape() {
+        EditAction editAction = ge.getEditActionStack().pollLast();
+        if (editAction != null) {
+            editAction.cancel();
+            return;
+        }
+        ge.getApplicationLayout().escape();
     }
 
 }

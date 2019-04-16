@@ -9,8 +9,8 @@ import java.util.List;
 public class SimpleAlphabeticalFileScanner implements FileScanner {
 
     private final Object lock = new Object();
-    private final File startingPoint;
 
+    private File startingPoint;
     private boolean ready = false;
     private int cursor;
     private File[] files;
@@ -76,6 +76,16 @@ public class SimpleAlphabeticalFileScanner implements FileScanner {
             int from = Math.max(0, cursor - num);
             return Collections.unmodifiableList(Arrays.asList(files).subList(from, cursor));
         }
+    }
+
+    @Override
+    public void setCurrent(File newFile) {
+        synchronized (lock) {
+            waitForReady();  // don't start several init threads in parallel
+            ready = false;
+            startingPoint = newFile;
+        }
+        start(null);
     }
 
     // caller must synchronize on lock
