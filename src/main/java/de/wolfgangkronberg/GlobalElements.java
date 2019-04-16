@@ -1,6 +1,7 @@
 package de.wolfgangkronberg;
 
 import javafx.scene.layout.Pane;
+import javafx.stage.Stage;
 import lombok.Data;
 
 /**
@@ -13,6 +14,11 @@ public class GlobalElements {
      * Application settings from config file and/or command line
      */
     private final AppProperties props = new AppProperties();
+
+    /**
+     * The single JavaFX stage of this application
+     */
+    private Stage stage;
 
     /**
      * Navigates through our images

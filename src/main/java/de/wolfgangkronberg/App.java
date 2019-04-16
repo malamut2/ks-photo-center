@@ -5,6 +5,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -26,6 +27,7 @@ public class App extends Application {
     public void start(Stage stage) {
         setCommandlineParams();
         stage.setTitle("ksPhotoCenter");
+        ge.setStage(stage);
         ge.setMainPane(createMainPane(stage));
         ge.setImagePane(createImagePane());
         ge.setImagePaneMessage(new TimedMessage(Pos.BOTTOM_RIGHT));
@@ -47,6 +49,7 @@ public class App extends Application {
         stage.setScene(scene);
         stage.setFullScreenExitHint("");
         stage.setFullScreen(true);
+        stage.setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
         stage.show();
         return result;
     }

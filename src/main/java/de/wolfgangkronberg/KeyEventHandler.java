@@ -26,6 +26,8 @@ public class KeyEventHandler implements EventHandler<KeyEvent> {
             ge.getNavigator().switchToPreviousPicture();
         } else if (code == F5) {
             ge.getNavigator().reloadImages();
+        } else if (code == F) {
+            ge.getStage().setFullScreen(!ge.getStage().isFullScreen());
         }
     }
 
