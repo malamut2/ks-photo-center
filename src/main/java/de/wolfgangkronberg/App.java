@@ -2,12 +2,11 @@ package de.wolfgangkronberg;
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
@@ -18,34 +17,52 @@ import java.util.List;
  */
 public class App extends Application {
 
-    private final AppProperties props = new AppProperties();
-    private final Navigator navigator = new Navigator();
-    private final KeyEventHandler keyEventHandler = new KeyEventHandler(navigator);
+    private final GlobalElements ge = new GlobalElements();
+    private final KeyEventHandler keyEventHandler = new KeyEventHandler(ge);
 
     private String currentPictureName = null;
 
     @Override
     public void start(Stage stage) {
         setCommandlineParams();
-        StackPane pane = new StackPane();
-        pane.setBackground(new Background(new BackgroundFill(Color.BLACK, CornerRadii.EMPTY, Insets.EMPTY)));
-        Scene scene = new Scene(pane, props.getWidth(), props.getHeight());
+        stage.setTitle("ksPhotoCenter");
+        ge.setMainPane(createMainPane(stage));
+        ge.setImagePane(createImagePane());
+        ge.setImagePaneMessage(new TimedMessage(Pos.BOTTOM_RIGHT));
+        ge.getImagePane().getChildren().add(ge.getImagePaneMessage().getRoot());
+        ge.getNavigator().init(currentPictureName);
+    }
+
+    @Override
+    public void stop() {
+        ge.getProps().saveSelectedOnExit();
+    }
+
+    private Pane createMainPane(Stage stage) {
+        AppProperties props = ge.getProps();
+        StackPane result = new StackPane();
+        result.setBackground(new Background(new BackgroundFill(Color.BLACK, CornerRadii.EMPTY, Insets.EMPTY)));
+        Scene scene = new Scene(result, props.getWidth(), props.getHeight());
         scene.addEventHandler(KeyEvent.KEY_PRESSED, keyEventHandler);
         stage.setScene(scene);
         stage.setFullScreenExitHint("");
         stage.setFullScreen(true);
         stage.show();
-        navigator.init(props, pane, currentPictureName);
+        return result;
     }
 
-    @Override
-    public void stop() {
-        props.saveSelectedOnExit();
+    private Pane createImagePane() {
+        Pane main = ge.getMainPane();
+        StackPane result = new StackPane();
+        main.getChildren().setAll(result);
+        Label imagePlaceholder = new Label("");
+        result.getChildren().add(imagePlaceholder);
+        return result;
     }
 
     private void setCommandlineParams() {
         Parameters parameters = getParameters();
-        props.loadParameters(parameters.getNamed());
+        ge.getProps().loadParameters(parameters.getNamed());
         List<String> unnamed = parameters.getUnnamed();
         if (!unnamed.isEmpty()) {
             currentPictureName = unnamed.get(0);

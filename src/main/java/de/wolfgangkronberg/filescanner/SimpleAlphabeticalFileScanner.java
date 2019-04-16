@@ -63,6 +63,7 @@ public class SimpleAlphabeticalFileScanner implements FileScanner {
     @Override
     public List<File> getNext(int num) {
         synchronized (lock) {
+            waitForReady();
             int to = Math.min(cursor + num, files.length);
             return Collections.unmodifiableList(Arrays.asList(files).subList(cursor, to));
         }
@@ -71,6 +72,7 @@ public class SimpleAlphabeticalFileScanner implements FileScanner {
     @Override
     public List<File> getPrevious(int num) {
         synchronized (lock) {
+            waitForReady();
             int from = Math.max(0, cursor - num);
             return Collections.unmodifiableList(Arrays.asList(files).subList(from, cursor));
         }

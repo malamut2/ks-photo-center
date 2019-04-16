@@ -11,20 +11,21 @@ import static javafx.scene.input.KeyCode.*;
  */
 public class KeyEventHandler implements EventHandler<KeyEvent> {
 
-    private final Navigator navigator;
+    private final GlobalElements ge;
 
-    public KeyEventHandler(Navigator navigator) {
-        this.navigator = navigator;
+    public KeyEventHandler(GlobalElements ge) {
+        this.ge = ge;
     }
 
     public void handle(KeyEvent key) {
+        ge.getImagePaneMessage().stop();
         KeyCode code = key.getCode();
         if (code == RIGHT) {
-            navigator.switchToNextPicture();
+            ge.getNavigator().switchToNextPicture();
         } else if (code == LEFT) {
-            navigator.switchToPreviousPicture();
+            ge.getNavigator().switchToPreviousPicture();
         } else if (code == F5) {
-            navigator.reloadImages();
+            ge.getNavigator().reloadImages();
         }
     }
 

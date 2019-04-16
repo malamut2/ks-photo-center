@@ -2,11 +2,8 @@ package de.wolfgangkronberg;
 
 import de.wolfgangkronberg.filescanner.FileCache;
 import javafx.beans.value.ChangeListener;
-import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.text.Font;
+import javafx.scene.layout.Pane;
 
 import java.io.File;
 import java.util.concurrent.ExecutionException;
@@ -16,25 +13,30 @@ import java.util.concurrent.ExecutionException;
  */
 public class Navigator {
 
-    private StackPane pane;
-    private Label message;
+    private final GlobalElements ge;
+    private Pane pane;
     private double paneHeight;
     private double paneWidth;
     private int numPrefetchedAroundCurrent;
+    private TimedMessage message;
 
     private FileSequence files;
     private GroupedCacheLoader<File, ImageWithMetadata> gCache;
     private FileCache<ImageWithMetadata> fCache;
 
+    public Navigator(GlobalElements ge) {
+        this.ge = ge;
+    }
+
     /**
      * Initialized the Navigator by setting the initial picture which shall be viewed.
      *
-     * @param props                  the currently active application properties
-     * @param pane                   the pane in which the image shall be displayed
      * @param pictureInitiallyViewed the path/name of the picture to be viewed, or null if just the newest picture
      */
-    public void init(AppProperties props, StackPane pane, String pictureInitiallyViewed) {
-
+    public void init(String pictureInitiallyViewed) {
+        AppProperties props = ge.getProps();
+        pane = ge.getImagePane();
+        message = ge.getImagePaneMessage();
         numPrefetchedAroundCurrent = props.getNumPrefetchAroundCurrent();
         File current = pictureInitiallyViewed == null ? null : new File(pictureInitiallyViewed);
         files = new FileSequence(props,
@@ -43,28 +45,19 @@ public class Navigator {
                 3, props.getNumCacheShownImages());
         fCache = new FileCache<>(files, gCache);
 
-        this.pane = pane;
-        paneHeight = pane.getHeight();
-        paneWidth = pane.getWidth();
+        Pane parent = ((Pane)pane.getParent());
+        paneHeight = parent.getHeight();
+        paneWidth = parent.getWidth();
         ChangeListener<Number> paneSizeListener = (observable, oldValue, newValue) -> {
-            paneHeight = pane.getHeight();
-            paneWidth = pane.getWidth();
+            paneHeight = parent.getHeight();
+            paneWidth = parent.getWidth();
             reloadLocal();
         };
-        pane.widthProperty().addListener(paneSizeListener);
-        pane.heightProperty().addListener(paneSizeListener);
+        parent.widthProperty().addListener(paneSizeListener);
+        parent.heightProperty().addListener(paneSizeListener);
 
-        Label imagePlaceholder = new Label("");
-        BorderPane bp1 = new BorderPane();
-        BorderPane bp2 = new BorderPane();
-        message = new Label("");
-        message.setFont(Font.font(40));
-        message.setStyle("-fx-text-fill: #f0f0f0; -fx-background-radius: 15; -fx-background-color: #30303080; -fx-background-insets: 15 10; -fx-label-padding: 20;");
-        bp1.setRight(bp2);
-        bp2.setBottom(message);
-        pane.getChildren().addAll(imagePlaceholder, bp1);
         if (pictureInitiallyViewed == null) {
-            message.setText("Library Mode is not implemented yet.");
+            message.play("Library Mode is not implemented yet.");
         } else {
             displayImage();
         }
@@ -73,21 +66,21 @@ public class Navigator {
     private void displayImage() {
         File current = fCache.prefetch("displayed", numPrefetchedAroundCurrent);
         if (current == null) {
-            message.setText("No image to display.");
+            message.play("No image to display.");
             return;
         }
         ImageWithMetadata iwm;
         try {
             iwm = gCache.get(current).get();
         } catch (InterruptedException e) {
-            message.setText("Interrupted while loading picture: " + current.getAbsolutePath());
+            message.play("Interrupted while loading picture: " + current.getAbsolutePath());
             return;
         } catch (ExecutionException e) {
-            message.setText("Error loading picture '" + current.getAbsolutePath() + "': " + e.toString());
+            message.play("Error loading picture '" + current.getAbsolutePath() + "': " + e.toString());
             return;
         }
         if (!iwm.isValid()) {
-            message.setText("Cannot find or display picture: " + current.getAbsolutePath());
+            message.play("Cannot find or display picture: " + current.getAbsolutePath());
             return;
         }
         ImageView iv = iwm.getImageView(paneWidth, paneHeight);
@@ -96,21 +89,17 @@ public class Navigator {
 
     public void switchToNextPicture() {
         if (!files.moveToNext()) {
-            message.setText("This is the last image.");
-            message.setVisible(true);
+            message.play("This is the last image.");
             return;
         }
-        message.setVisible(false);
         displayImage();
     }
 
     public void switchToPreviousPicture() {
         if (!files.moveToPrevious()) {
-            message.setText("This is the first image.");
-            message.setVisible(true);
+            message.play("This is the first image.");
             return;
         }
-        message.setVisible(false);
         displayImage();
     }
 
