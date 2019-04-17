@@ -75,8 +75,8 @@ public class GroupedCacheLoader<K,V> {
         tasks.forEach(taskQueue::offer);
     }
 
+    @SuppressWarnings("unchecked")
     private MyFutureTask getMyFutureTask(Runnable r) {
-        //noinspection unchecked
         return (MyFutureTask)r;
     }
 
@@ -133,9 +133,9 @@ public class GroupedCacheLoader<K,V> {
             prestartAllCoreThreads();
         }
 
+        @SuppressWarnings("unchecked")
         @Override
         protected <T> RunnableFuture<T> newTaskFor(Callable<T> callable) {
-            //noinspection unchecked
             return (FutureTask<T>)new MyFutureTask((Callable<V>)callable);
         }
 
@@ -145,6 +145,8 @@ public class GroupedCacheLoader<K,V> {
 
         private final K key;
 
+        //  IntelliJ does not complain about the (MyWorker) cast, but javac does.
+        @SuppressWarnings({"unchecked", "RedundantSuppression"})
         MyFutureTask(Callable<V> callable) {
             super(callable);
             MyWorker worker = (MyWorker)callable;

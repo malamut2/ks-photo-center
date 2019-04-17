@@ -1,7 +1,9 @@
 package de.wolfgangkronberg;
 
 import de.wolfgangkronberg.filescanner.FileScanner;
-import de.wolfgangkronberg.filescanner.SimpleAlphabeticalFileScanner;
+import de.wolfgangkronberg.filescanner.LibraryPerDirFileScanner;
+import de.wolfgangkronberg.filescanner.SimpleFileScanner;
+import de.wolfgangkronberg.filescanner.TraverseTreeFileScanner;
 
 import java.io.File;
 import java.util.List;
@@ -14,7 +16,15 @@ public class FileSequence {
         int fileScanSize = props.getNumTraverseFiles();
         switch (navStrategy) {
             case CurrentDirAlphabetical:
-                fileScanner = new SimpleAlphabeticalFileScanner(startingPoint);
+            case CurrentDirByTime:
+                fileScanner = new SimpleFileScanner(startingPoint, navStrategy.isAlphabetical());
+                break;
+            case TraverseTreeAlphabetical:
+            case TraverseTreeByTime:
+                fileScanner = new TraverseTreeFileScanner(startingPoint, navStrategy.isAlphabetical(), fileScanSize);
+                break;
+            case LibraryByTimePerDir:
+                fileScanner = new LibraryPerDirFileScanner(startingPoint, fileScanSize);
                 break;
             default:
                 throw new RuntimeException("Strategy not yet implemented: " + navStrategy.name());

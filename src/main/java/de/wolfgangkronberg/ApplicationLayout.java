@@ -102,11 +102,13 @@ public class ApplicationLayout {
                 }
                 centralPane.getChildren().set(0, ge.getImagePane());
                 state = State.imageWithControls;
+                ge.getNavigator().init();
                 break;
             case imageWithControls:
                 centralPane.getChildren().set(0, thumbnailPane);  // remove imagePane from here
                 ge.getMainPane().getChildren().set(0, ge.getImagePane());
                 state = State.imageOnly;
+                ge.getNavigator().init();
                 break;
             default:
                 break;
@@ -126,10 +128,12 @@ public class ApplicationLayout {
                 ge.getMainPane().getChildren().set(0, controlPane);
                 centralPane.getChildren().set(0, ge.getImagePane());
                 state = State.imageWithControls;
+                ge.getNavigator().init();
                 break;
             case imageWithControls:
                 centralPane.getChildren().set(0, thumbnailPane);
                 state = State.thumbnail;
+                ge.getNavigator().init();
                 break;
             default:
                 break;

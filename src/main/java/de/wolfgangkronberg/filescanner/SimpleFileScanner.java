@@ -1,22 +1,24 @@
 package de.wolfgangkronberg.filescanner;
 
 import java.io.File;
-import java.text.Collator;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
-public class SimpleAlphabeticalFileScanner implements FileScanner {
+public class SimpleFileScanner implements FileScanner {
 
     private final Object lock = new Object();
+    private final Comparator<File> comparator;
 
     private File startingPoint;
     private boolean ready = false;
     private int cursor;
     private File[] files;
 
-    public SimpleAlphabeticalFileScanner(File startingPoint) {
+    public SimpleFileScanner(File startingPoint, boolean alphabetical) {
         this.startingPoint = startingPoint;
+        comparator = alphabetical ? new AlphabeticalComparator() : new TimeComparator();
     }
 
     @Override
@@ -116,20 +118,9 @@ public class SimpleAlphabeticalFileScanner implements FileScanner {
                 files_ = new File[]{startingPoint};
                 cursor_ = 0;
             } else {
-
-                final Collator coll = Collator.getInstance();
-                Arrays.sort(files_, (f1, f2) -> {
-                    String name1 = f1.getName();
-                    String name2 = f2.getName();
-                    int result = coll.compare(name1, name2);
-                    if (result == 0) {
-                        result = name1.compareTo(name2);
-                    }
-                    return result;
-                });
-                cursor_ = Arrays.binarySearch(files_, startingPoint);
+                Arrays.sort(files_, comparator);
+                cursor_ = Arrays.binarySearch(files_, startingPoint, comparator);
                 assert (cursor_ >= 0);
-
             }
 
             synchronized (lock) {

@@ -44,18 +44,20 @@ public class Navigator {
         fCache = new FileCache<>(files, gCache);
 
         Pane parent = ((Pane)pane.getParent());
-        paneHeight = parent.getHeight();
-        paneWidth = parent.getWidth();
-        ChangeListener<Number> paneSizeListener = (observable, oldValue, newValue) -> {
+        if (parent != null) {
             paneHeight = parent.getHeight();
             paneWidth = parent.getWidth();
-            reloadLocal();
-        };
-        parent.widthProperty().addListener(paneSizeListener);
-        parent.heightProperty().addListener(paneSizeListener);
+            ChangeListener<Number> paneSizeListener = (observable, oldValue, newValue) -> {
+                paneHeight = parent.getHeight();
+                paneWidth = parent.getWidth();
+                reloadLocal();
+            };
+            parent.widthProperty().addListener(paneSizeListener);
+            parent.heightProperty().addListener(paneSizeListener);
 
-        if (current != null) {
-            displayImage();
+            if (current != null) {
+                displayImage();
+            }
         }
     }
 
