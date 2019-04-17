@@ -64,4 +64,14 @@ public class GlobalElements {
      */
     private File currentImage;
 
+    /**
+     * The requested zoom level of the picture. 1 equals to physical picture size. -1 equals to 'fit to screen'.
+     */
+    private double imageZoom = -1;
+
+    /**
+     * The actual zoom level of the picture, as calculated from what is currently shown. Is never negative.
+     */
+    private double effectiveImageZoom = 1;
+
 }

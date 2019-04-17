@@ -39,18 +39,18 @@ public class Navigator {
         numPrefetchedAroundCurrent = props.getNumPrefetchAroundCurrent();
         files = new FileSequence(props,
                 current == null ? props.getDefaultNavStrategy() : props.getOpenFileNavStrategy(), current);
-        gCache = new GroupedCacheLoader<>(ImageWithMetadata::new,
+        gCache = new GroupedCacheLoader<>((f) -> new ImageWithMetadata(ge, f),
                 3, props.getNumCacheShownImages());
         fCache = new FileCache<>(files, gCache);
 
-        Pane parent = ((Pane)pane.getParent());
+        Pane parent = ((Pane)pane.getParent());  // !kgb don't use parent. Use separate logic instead. Also, introduce panning of zoomed images.
         if (parent != null) {
             paneHeight = parent.getHeight();
             paneWidth = parent.getWidth();
             ChangeListener<Number> paneSizeListener = (observable, oldValue, newValue) -> {
                 paneHeight = parent.getHeight();
                 paneWidth = parent.getWidth();
-                reloadLocal();
+                displayImage();
             };
             parent.widthProperty().addListener(paneSizeListener);
             parent.heightProperty().addListener(paneSizeListener);
@@ -83,14 +83,10 @@ public class Navigator {
     }
 
     public void reloadImages() {
-        files.reload(this::reloadLocal);
+        files.reload(this::displayImage);
     }
 
-    private void reloadLocal() {
-        displayImage();
-    }
-
-    private void displayImage() {
+    public void displayImage() {
         File current = fCache.prefetch("displayed", numPrefetchedAroundCurrent);
         if (current == null) {
             message.play("No image to display.");

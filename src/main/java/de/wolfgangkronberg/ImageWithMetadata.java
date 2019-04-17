@@ -6,22 +6,18 @@ import com.drew.metadata.Metadata;
 import com.drew.metadata.exif.ExifIFD0Directory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import lombok.Data;
 
 import java.io.File;
 import java.io.IOException;
 
-@Data
 public class ImageWithMetadata {
 
-    private Image image;
-    private Metadata metadata;
+    private final GlobalElements ge;
+    private final Image image;
+    private final Metadata metadata;
 
-    @SuppressWarnings("unused")  // Lombok
-    public ImageWithMetadata() {
-    }
-
-    public ImageWithMetadata(File imageFile) {
+    public ImageWithMetadata(GlobalElements ge, File imageFile) {
+        this.ge = ge;
         this.image = new Image(imageFile.toURI().toString());
         this.metadata = getMetadata(imageFile);
     }
@@ -29,11 +25,26 @@ public class ImageWithMetadata {
     public ImageView getImageView(double width, double height) {
         final int rotate = getRotation();
         ImageView result = new ImageView(image);
-        result.setFitWidth(width);
-        result.setFitHeight(height);
+        double zoom = ge.getImageZoom();
+        if (zoom < 0) {
+            result.setFitWidth(width);
+            result.setFitHeight(height);
+            ge.setEffectiveImageZoom(calculateZoom(rotate, width, height));
+        } else {
+            result.setScaleX(zoom);
+            result.setScaleY(zoom);
+            ge.setEffectiveImageZoom(zoom);
+        }
         result.setRotate(rotate);
         result.setPreserveRatio(true);
         return result;
+    }
+
+    private double calculateZoom(int rotate, double width, double height) {
+        boolean tipped = rotate == 90 || rotate == 270;
+        double scale1 = height / (tipped ? image.getWidth() : image.getHeight());
+        double scale2 = width / (tipped ? image.getHeight() : image.getWidth());
+        return Math.min(scale1, scale2);
     }
 
     /**
