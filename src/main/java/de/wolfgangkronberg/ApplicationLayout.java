@@ -33,23 +33,23 @@ public class ApplicationLayout {
         this.ge = ge;
         this.state = initialState;
         Pane main = ge.getMainPane();
-        centralPane = createCentralPane();
         controlPane = new BorderPane();
-        controlPane.setLeft(createLeftPane());
-        controlPane.setRight(createRightPane());
+        centralPane = createCentralPane();
         thumbnailPane = new FlowPane();
         ge.setCentralPaneMessage(new TimedMessage(Pos.CENTER));
         centralPane.getChildren().add(ge.getCentralPaneMessage().getRoot());
+        controlPane.setLeft(createLeftPane());
         controlPane.setCenter(centralPane);
+        controlPane.setRight(createRightPane());
 
         switch (initialState) {
             case thumbnail:
                 centralPane.getChildren().set(0, thumbnailPane);
-                main.getChildren().setAll(centralPane);
+                main.getChildren().setAll(controlPane);
                 break;
             case imageWithControls:
                 centralPane.getChildren().set(0, ge.getImagePane());
-                main.getChildren().setAll(centralPane);
+                main.getChildren().setAll(controlPane);
                 break;
             case imageOnly:
                 main.getChildren().setAll(ge.getImagePane());

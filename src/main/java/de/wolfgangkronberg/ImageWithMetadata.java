@@ -27,20 +27,13 @@ public class ImageWithMetadata {
     }
 
     public ImageView getImageView(double width, double height) {
-        int rotate = getRotation();
+        final int rotate = getRotation();
         ImageView result = new ImageView(image);
+        result.setFitWidth(width);
+        result.setFitHeight(height);
         result.setRotate(rotate);
-        double factor = getFullScreenScale(rotate, width, height);
-        result.setScaleX(factor);
-        result.setScaleY(factor);
+        result.setPreserveRatio(true);
         return result;
-    }
-
-    private double getFullScreenScale(int rotate, double paneWidth, double paneHeight) {
-        boolean tipped = rotate == 90 || rotate == 270;
-        double scale1 = paneHeight / (tipped ? image.getWidth() : image.getHeight());
-        double scale2 = paneWidth / (tipped ? image.getHeight() : image.getWidth());
-        return Math.min(scale1, scale2);
     }
 
     /**
