@@ -4,6 +4,7 @@ import com.drew.imaging.ImageMetadataReader;
 import com.drew.imaging.ImageProcessingException;
 import com.drew.metadata.Metadata;
 import com.drew.metadata.exif.ExifIFD0Directory;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
@@ -25,26 +26,42 @@ public class ImageWithMetadata {
     public ImageView getImageView(double width, double height) {
         final int rotate = getRotation();
         ImageView result = new ImageView(image);
+        result.setRotate(rotate);
+        result.setPreserveRatio(true);
         double zoom = ge.getImageZoom();
+        boolean tipped = isTipped(rotate);
         if (zoom < 0) {
             result.setFitWidth(width);
             result.setFitHeight(height);
-            ge.setEffectiveImageZoom(calculateZoom(rotate, width, height));
+            result.setViewport(null);
+            ge.setEffectiveImageZoom(calculateZoom(tipped, width, height));
         } else {
             result.setScaleX(zoom);
             result.setScaleY(zoom);
+            result.setViewport(calculateViewport(tipped, width, height, zoom));
             ge.setEffectiveImageZoom(zoom);
         }
-        result.setRotate(rotate);
-        result.setPreserveRatio(true);
         return result;
     }
 
-    private double calculateZoom(int rotate, double width, double height) {
-        boolean tipped = rotate == 90 || rotate == 270;
+    private Rectangle2D calculateViewport(boolean tipped, double width, double height, double zoom) {
+        double frameWidth = tipped ? height : width;
+        double frameHeight = tipped ? width : height;
+        double picWidth = image.getWidth() * zoom;
+        double picHeight = image.getHeight() * zoom;
+        double x = (picWidth - frameWidth)/2;
+        double y = (picHeight - frameHeight)/2;
+        return new Rectangle2D(x/zoom, y/zoom, frameWidth/zoom, frameHeight/zoom);
+    }
+
+    private double calculateZoom(boolean tipped, double width, double height) {
         double scale1 = height / (tipped ? image.getWidth() : image.getHeight());
         double scale2 = width / (tipped ? image.getHeight() : image.getWidth());
         return Math.min(scale1, scale2);
+    }
+
+    private boolean isTipped(int rotate) {
+        return rotate == 90 || rotate == 270;
     }
 
     /**

@@ -9,6 +9,9 @@ public class ApplicationLayout {
     private final GlobalElements ge;
     private State state;
 
+    private final Object lock = new Object();
+    private Runnable imagePaneSizeListener = null;
+
     /**
      * The standard application pane, with all the controls on the right and left side
      */
@@ -24,7 +27,6 @@ public class ApplicationLayout {
      */
     private final FlowPane thumbnailPane;
 
-
     public enum State {
         thumbnail, imageWithControls, imageOnly
     }
@@ -33,6 +35,16 @@ public class ApplicationLayout {
         this.ge = ge;
         this.state = initialState;
         Pane main = ge.getMainPane();
+        main.layoutBoundsProperty().addListener((observableValue, bounds, t1) -> {
+            Runnable r;
+            synchronized (lock) {
+                r = imagePaneSizeListener;
+            }
+            if (r != null) {
+                r.run();
+            }
+        });
+
         controlPane = new BorderPane();
         centralPane = createCentralPane();
         thumbnailPane = new FlowPane();
@@ -56,6 +68,25 @@ public class ApplicationLayout {
                 break;
         }
 
+    }
+
+    public double getImagePaneHeight() {
+        return ge.getMainPane().getHeight();
+    }
+
+    public double getImagePaneWidth() {
+        if (state == State.imageOnly) {
+            return ge.getMainPane().getWidth();
+        }
+        double height = ge.getMainPane().getHeight();
+        return Math.max (0, ge.getMainPane().getWidth()
+                - controlPane.getLeft().prefWidth(height) - controlPane.getRight().prefWidth(height));
+    }
+
+    public void setImagePaneSizeListener(Runnable r) {
+        synchronized (lock) {
+            imagePaneSizeListener = r;
+        }
     }
 
     private StackPane createCentralPane() {

@@ -22,6 +22,7 @@ public class GroupedCacheLoader<K,V> {
     private final LinkedList<K> lruCache = new LinkedList<>();
     private final Map<K, Future<V>> cache = new HashMap<>();
     private final Map<String, Set<K>> groups = new HashMap<>();
+    private final LinkedList<Future<V>> inProgress = new LinkedList<>();
 
     public GroupedCacheLoader(Function<K,V> provider, int numWorkerThreads, int lruEntries) {
         this.provider = provider;
@@ -51,6 +52,7 @@ public class GroupedCacheLoader<K,V> {
                 removeUnreferencedInGroups(lruCache.removeLast());
             }
             Future<V> result = cache.computeIfAbsent(key, this::queue);
+            inProgress.add(result);
             moveTaskToFront(key);
             return result;
         }
@@ -84,11 +86,17 @@ public class GroupedCacheLoader<K,V> {
     private void removeFromTaskQueue(K key) {
         ArrayList<Runnable> tasks = new ArrayList<>(taskQueue.size());
         taskQueue.drainTo(tasks);
+        cleanupInProgress();
         for (Runnable task : tasks) {
-            if (!key.equals(getMyFutureTask(task).key)) {
+            MyFutureTask futureTask = getMyFutureTask(task);
+            if ((!key.equals(futureTask.key)) && inProgress.contains(futureTask)) {
                 taskQueue.offer(task);
             }
         }
+    }
+
+    private void cleanupInProgress() {
+        inProgress.removeIf(Future::isDone);
     }
 
     // caller must synchronize on lock

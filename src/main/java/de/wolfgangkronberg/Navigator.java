@@ -43,21 +43,15 @@ public class Navigator {
                 3, props.getNumCacheShownImages());
         fCache = new FileCache<>(files, gCache);
 
-        Pane parent = ((Pane)pane.getParent());  // !kgb don't use parent. Use separate logic instead. Also, introduce panning of zoomed images.
-        if (parent != null) {
-            paneHeight = parent.getHeight();
-            paneWidth = parent.getWidth();
-            ChangeListener<Number> paneSizeListener = (observable, oldValue, newValue) -> {
-                paneHeight = parent.getHeight();
-                paneWidth = parent.getWidth();
-                displayImage();
-            };
-            parent.widthProperty().addListener(paneSizeListener);
-            parent.heightProperty().addListener(paneSizeListener);
+        ApplicationLayout appLayout = ge.getApplicationLayout();
+        appLayout.setImagePaneSizeListener(() -> {
+            paneHeight = appLayout.getImagePaneHeight();
+            paneWidth = appLayout.getImagePaneWidth();
+            displayImage();
+        });
 
-            if (current != null) {
-                displayImage();
-            }
+        if (current != null) {
+            displayImage();
         }
     }
 
