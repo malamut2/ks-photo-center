@@ -1,6 +1,7 @@
 package de.wolfgangkronberg.kspc;
 
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 
@@ -15,12 +16,12 @@ public class ApplicationLayout {
     /**
      * The standard application pane, with all the controls on the right and left side
      */
-    private final BorderPane controlPane;
+    private final AnchorPane controlPane;
 
     /**
      * The center area of the control pane. Contains the thumbnailPane, the imagePane, or nothing.
      */
-    private final StackPane centralPane;
+    private final AnchorPane centralPane;
 
     /**
      * Displays image thumbnails
@@ -45,14 +46,15 @@ public class ApplicationLayout {
             }
         });
 
-        controlPane = new BorderPane();
+        controlPane = new AnchorPane();
         centralPane = createCentralPane();
         thumbnailPane = new FlowPane();
         ge.setCentralPaneMessage(new TimedMessage(Pos.CENTER));
         centralPane.getChildren().add(ge.getCentralPaneMessage().getRoot());
-        controlPane.setLeft(createLeftPane());
-        controlPane.setCenter(centralPane);
-        controlPane.setRight(createRightPane());
+        controlPane.getChildren().addAll(createLeftPane(), centralPane, createRightPane());
+        setMaxAnchorToChild(controlPane, 0, 0d, 50d, 0d, 0d);
+        setMaxAnchorToChild(controlPane, 1, 0d, 50d, 0d, 50d);
+        setMaxAnchorToChild(controlPane, 2, 0d, 0d, 0d, null);
 
         switch (initialState) {
             case thumbnail:
@@ -68,6 +70,28 @@ public class ApplicationLayout {
                 break;
         }
 
+        setMaxAnchorToFirstChild(ge.getMainPane());
+        setMaxAnchorToFirstChild(centralPane);
+
+        // !kgb set clip rectangle to center pane!  e.g. https://stackoverflow.com/questions/15920680/how-to-restrict-visibility-of-items
+
+    }
+
+    private void setMaxAnchorToFirstChild(Pane pane) {
+        setMaxAnchorToChild(pane, 0, 0d,0d, 0d, 0d);
+    }
+
+    private void setMaxAnchorToChild(Pane pane, int child, Double top, Double right, Double bottom, Double left) {
+        if (pane instanceof AnchorPane) {
+            AnchorPane ap = (AnchorPane)pane;
+            Node n = ap.getChildren().get(child);
+            if (n != null) {
+                ap.setBottomAnchor(n, bottom);
+                ap.setTopAnchor(n, top);
+                ap.setLeftAnchor(n, left);
+                ap.setRightAnchor(n, right);
+            }
+        }
     }
 
     public double getImagePaneHeight() {
@@ -78,9 +102,7 @@ public class ApplicationLayout {
         if (state == State.imageOnly) {
             return ge.getMainPane().getWidth();
         }
-        double height = ge.getMainPane().getHeight();
-        return Math.max (0, ge.getMainPane().getWidth()
-                - controlPane.getLeft().prefWidth(height) - controlPane.getRight().prefWidth(height));
+        return Math.max (0, ge.getMainPane().getWidth() - 100);  // !kgb make 100, 50 to variables
     }
 
     public void setImagePaneSizeListener(Runnable r) {
@@ -89,8 +111,8 @@ public class ApplicationLayout {
         }
     }
 
-    private StackPane createCentralPane() {
-        StackPane result = new StackPane();
+    private AnchorPane createCentralPane() {
+        AnchorPane result = new AnchorPane();
         Label contentPlaceholder = new Label("");
         result.getChildren().add(contentPlaceholder);
         return result;
@@ -132,12 +154,15 @@ public class ApplicationLayout {
                     return false;
                 }
                 centralPane.getChildren().set(0, ge.getImagePane());
+                setMaxAnchorToFirstChild(centralPane);
                 state = State.imageWithControls;
                 ge.getNavigator().init();
                 break;
             case imageWithControls:
                 centralPane.getChildren().set(0, thumbnailPane);  // remove imagePane from here
+                setMaxAnchorToFirstChild(centralPane);
                 ge.getMainPane().getChildren().set(0, ge.getImagePane());
+                setMaxAnchorToFirstChild(ge.getMainPane());
                 state = State.imageOnly;
                 ge.getNavigator().init();
                 break;
@@ -157,12 +182,15 @@ public class ApplicationLayout {
         switch (state) {
             case imageOnly:
                 ge.getMainPane().getChildren().set(0, controlPane);
+                setMaxAnchorToFirstChild(ge.getMainPane());
                 centralPane.getChildren().set(0, ge.getImagePane());
+                setMaxAnchorToFirstChild(centralPane);
                 state = State.imageWithControls;
                 ge.getNavigator().init();
                 break;
             case imageWithControls:
                 centralPane.getChildren().set(0, thumbnailPane);
+                setMaxAnchorToFirstChild(centralPane);
                 state = State.thumbnail;
                 ge.getNavigator().init();
                 break;

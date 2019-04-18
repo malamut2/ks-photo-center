@@ -53,7 +53,7 @@ public class App extends Application {
 
     private Pane createMainPane(Stage stage) {
         AppProperties props = ge.getProps();
-        StackPane result = new StackPane();
+        AnchorPane result = new AnchorPane();
         result.setBackground(new Background(new BackgroundFill(Color.BLACK, CornerRadii.EMPTY, Insets.EMPTY)));
         Scene scene = new Scene(result, props.getWidth(), props.getHeight());
         scene.addEventHandler(KeyEvent.KEY_PRESSED, keyEventHandler);
