@@ -1,6 +1,4 @@
-package de.wolfgangkronberg.filescanner;
-
-import de.wolfgangkronberg.filescanner.FileScanner;
+package de.wolfgangkronberg.kspc.filescanner;
 
 import java.io.File;
 import java.util.List;

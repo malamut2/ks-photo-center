@@ -1,7 +1,6 @@
-package de.wolfgangkronberg;
+package de.wolfgangkronberg.kspc;
 
-import de.wolfgangkronberg.filescanner.FileCache;
-import javafx.beans.value.ChangeListener;
+import de.wolfgangkronberg.kspc.filescanner.FileCache;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 

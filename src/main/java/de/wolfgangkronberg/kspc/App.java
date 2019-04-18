@@ -1,4 +1,4 @@
-package de.wolfgangkronberg;
+package de.wolfgangkronberg.kspc;
 
 import javafx.application.Application;
 import javafx.geometry.Insets;

@@ -1,4 +1,4 @@
-package de.wolfgangkronberg;
+package de.wolfgangkronberg.kspc;
 
 /**
  * Models the various strategies for moving forward/backward through images

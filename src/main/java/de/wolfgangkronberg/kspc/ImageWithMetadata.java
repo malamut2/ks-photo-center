@@ -1,4 +1,4 @@
-package de.wolfgangkronberg;
+package de.wolfgangkronberg.kspc;
 
 import com.drew.imaging.ImageMetadataReader;
 import com.drew.imaging.ImageProcessingException;

@@ -1,9 +1,9 @@
-package de.wolfgangkronberg;
+package de.wolfgangkronberg.kspc;
 
-import de.wolfgangkronberg.filescanner.FileScanner;
-import de.wolfgangkronberg.filescanner.LibraryPerDirFileScanner;
-import de.wolfgangkronberg.filescanner.SimpleFileScanner;
-import de.wolfgangkronberg.filescanner.TraverseTreeFileScanner;
+import de.wolfgangkronberg.kspc.filescanner.FileScanner;
+import de.wolfgangkronberg.kspc.filescanner.LibraryPerDirFileScanner;
+import de.wolfgangkronberg.kspc.filescanner.SimpleFileScanner;
+import de.wolfgangkronberg.kspc.filescanner.TraverseTreeFileScanner;
 
 import java.io.File;
 import java.util.List;

@@ -1,4 +1,4 @@
-package de.wolfgangkronberg.edit;
+package de.wolfgangkronberg.kspc.edit;
 
 /**
  * Represents the common interface of all on-screen user edit actions, like rotate, crop, paint, etc.

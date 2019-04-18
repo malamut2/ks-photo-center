@@ -1,6 +1,6 @@
-package de.wolfgangkronberg;
+package de.wolfgangkronberg.kspc;
 
-import de.wolfgangkronberg.edit.EditAction;
+import de.wolfgangkronberg.kspc.edit.EditAction;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import lombok.Data;

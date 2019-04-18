@@ -1,5 +1,7 @@
-package de.wolfgangkronberg;
+package de.wolfgangkronberg.kspc;
 
+import de.wolfgangkronberg.kspc.GlobalElements;
+import de.wolfgangkronberg.kspc.ZoomLevelSteps;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

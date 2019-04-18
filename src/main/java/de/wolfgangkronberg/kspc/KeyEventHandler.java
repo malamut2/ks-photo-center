@@ -1,6 +1,6 @@
-package de.wolfgangkronberg;
+package de.wolfgangkronberg.kspc;
 
-import de.wolfgangkronberg.edit.EditAction;
+import de.wolfgangkronberg.kspc.edit.EditAction;
 import javafx.event.EventHandler;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;

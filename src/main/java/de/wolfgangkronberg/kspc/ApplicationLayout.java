@@ -1,4 +1,4 @@
-package de.wolfgangkronberg;
+package de.wolfgangkronberg.kspc;
 
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;

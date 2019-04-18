@@ -1,4 +1,4 @@
-package de.wolfgangkronberg;
+package de.wolfgangkronberg.kspc;
 
 import javafx.animation.FadeTransition;
 import javafx.animation.PauseTransition;

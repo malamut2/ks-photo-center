@@ -1,4 +1,4 @@
-import de.wolfgangkronberg.App;
+import de.wolfgangkronberg.kspc.App;
 import javafx.application.Application;
 
 /**
