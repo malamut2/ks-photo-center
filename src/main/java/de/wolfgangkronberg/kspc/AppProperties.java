@@ -73,12 +73,12 @@ public class AppProperties {
     /**
      * The width of the side pane left to the image/thumbnail pane, in pixels
      */
-    private double leftSidePaneWidth = 250d;
+    private double leftSidePaneWidth = 200d;
 
     /**
      * The width of the side pane right to the image/thumbnail pane, in pixels
      */
-    private double rightSidePaneWidth = 250d;
+    private double rightSidePaneWidth = 200d;
 
     public void loadParameters(Map<String, String> cmdLine) {
         Map<String, String> newProps = new HashMap<>(cmdLine);

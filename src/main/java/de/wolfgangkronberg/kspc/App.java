@@ -33,6 +33,8 @@ public class App extends Application {
         ge.setImageCache(new GroupedCacheLoader<>((f) -> new ImageWithMetadata(ge, f),
                 3, props.getNumCacheShownImages()));
         stage.setTitle("ksPhotoCenter");
+        stage.setMinWidth(100 + ge.getProps().getLeftSidePaneWidth() + ge.getProps().getRightSidePaneWidth());
+        stage.setMinHeight(100);
         ge.setStage(stage);
         ge.setMainPane(createMainPane(stage));
         ge.setImagePane(createImagePane());

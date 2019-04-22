@@ -56,7 +56,8 @@ public class ApplicationLayout {
         setAnchorToChild(controlPane, 0, 0d, ge.getProps().getLeftSidePaneWidth(), 0d, 0d);
         setAnchorToChild(controlPane, 1, 0d, ge.getProps().getRightSidePaneWidth(),
                 0d, ge.getProps().getLeftSidePaneWidth());
-        setAnchorToChild(controlPane, 2, 0d, 0d, 0d, null);  // !kgb not nice. Reset on ImagePaneWidth change?
+        setRightPaneAnchor();
+        controlPane.widthProperty().addListener((a, b, c) -> setRightPaneAnchor());
 
         switch (initialState) {
             case thumbnail:
@@ -80,6 +81,11 @@ public class ApplicationLayout {
         clipRect.heightProperty().bind(centralPane.heightProperty());
         centralPane.setClip(clipRect);
 
+    }
+
+    private void setRightPaneAnchor() {
+        double leftDist = Math.max(0d, controlPane.getWidth() - ge.getProps().getRightSidePaneWidth());
+        setAnchorToChild(controlPane, 2, 0d, 0d, 0d, leftDist);
     }
 
     private void setMaxAnchorToFirstChild(Pane pane) {
