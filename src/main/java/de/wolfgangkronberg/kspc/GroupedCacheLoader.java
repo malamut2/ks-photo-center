@@ -67,7 +67,7 @@ public class GroupedCacheLoader<K,V> {
             if (priorityKey.equals(fTask.key)) {
                 taskQueue.offer(task);
                 for (Runnable task2 : tasks) {
-                    if (!priorityKey.equals(getMyFutureTask(task2).key)) {
+                    if (task != task2) {
                         taskQueue.offer(task);
                     }
                 }
@@ -89,7 +89,7 @@ public class GroupedCacheLoader<K,V> {
         cleanupInProgress();
         for (Runnable task : tasks) {
             MyFutureTask futureTask = getMyFutureTask(task);
-            if ((!key.equals(futureTask.key)) && inProgress.contains(futureTask)) {
+            if ((!key.equals(futureTask.key)) || inProgress.contains(futureTask)) {
                 taskQueue.offer(task);
             }
         }
@@ -120,6 +120,12 @@ public class GroupedCacheLoader<K,V> {
     // caller must synchronize on lock
     private Future<V> queue(K key) {
         return executor.submit(new MyWorker(key));
+    }
+
+    public void inspectFuture(Future<V> future) {
+        new Thread(() -> {
+            System.out.println("Inspected: " + future.toString());
+        }, "GroupedCacheLoader-Inspector").start();
     }
 
     private static class MyThreadFactory implements ThreadFactory {
@@ -161,6 +167,13 @@ public class GroupedCacheLoader<K,V> {
             key = worker.key;
         }
 
+        @Override
+        public String toString() {
+            return "MyFutureTask{" +
+                    "key=" + key +
+                    "instance=" + super.toString() +
+                    '}';
+        }
     }
 
     private class MyWorker implements Callable<V> {

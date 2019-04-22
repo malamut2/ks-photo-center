@@ -27,8 +27,11 @@ public class App extends Application {
     @Override
     public void start(Stage stage) {
         setCommandlineParams();
+        AppProperties props = ge.getProps();
         File current = currentPictureName == null ? null : new File(currentPictureName);
         ge.setCurrentImage(current);
+        ge.setImageCache(new GroupedCacheLoader<>((f) -> new ImageWithMetadata(ge, f),
+                3, props.getNumCacheShownImages()));
         stage.setTitle("ksPhotoCenter");
         ge.setStage(stage);
         ge.setMainPane(createMainPane(stage));

@@ -74,4 +74,9 @@ public class GlobalElements {
      */
     private double effectiveImageZoom = 1;
 
+    /**
+     * The cache for the loaded images, resp. the futures to them
+     */
+    private GroupedCacheLoader<File, ImageWithMetadata> imageCache;
+
 }

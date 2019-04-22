@@ -6,6 +6,9 @@ import javafx.scene.layout.Pane;
 
 import java.io.File;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Keeps track on which picture is actually being displayed
@@ -20,7 +23,6 @@ public class Navigator {
     private TimedMessage message;
 
     private FileSequence files;
-    private GroupedCacheLoader<File, ImageWithMetadata> gCache;
     private FileCache<ImageWithMetadata> fCache;
 
     public Navigator(GlobalElements ge) {
@@ -38,9 +40,7 @@ public class Navigator {
         numPrefetchedAroundCurrent = props.getNumPrefetchAroundCurrent();
         files = new FileSequence(props,
                 current == null ? props.getDefaultNavStrategy() : props.getOpenFileNavStrategy(), current);
-        gCache = new GroupedCacheLoader<>((f) -> new ImageWithMetadata(ge, f),
-                3, props.getNumCacheShownImages());
-        fCache = new FileCache<>(files, gCache);
+        fCache = new FileCache<>(files, ge.getImageCache());
 
         ApplicationLayout appLayout = ge.getApplicationLayout();
         appLayout.setImagePaneSizeListener(() -> {
@@ -85,14 +85,19 @@ public class Navigator {
             message.play("No image to display.");
             return;
         }
+        final Future<ImageWithMetadata> future = ge.getImageCache().get(current);
         ImageWithMetadata iwm;
         try {
-            iwm = gCache.get(current).get();
+            iwm = future.get(10, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             message.play("Interrupted while loading picture: " + current.getAbsolutePath());
             return;
         } catch (ExecutionException e) {
             message.play("Error loading picture '" + current.getAbsolutePath() + "': " + e.toString());
+            return;
+        } catch (TimeoutException e) {
+            message.play("Timeout while loading picture: " + current.getAbsolutePath());
+            ge.getImageCache().inspectFuture(future);
             return;
         }
         if (!iwm.isValid()) {
