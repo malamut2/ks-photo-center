@@ -4,6 +4,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
+import javafx.scene.shape.Rectangle;
 
 public class ApplicationLayout {
 
@@ -52,9 +53,10 @@ public class ApplicationLayout {
         ge.setCentralPaneMessage(new TimedMessage(Pos.CENTER));
         centralPane.getChildren().add(ge.getCentralPaneMessage().getRoot());
         controlPane.getChildren().addAll(createLeftPane(), centralPane, createRightPane());
-        setMaxAnchorToChild(controlPane, 0, 0d, 50d, 0d, 0d);
-        setMaxAnchorToChild(controlPane, 1, 0d, 50d, 0d, 50d);
-        setMaxAnchorToChild(controlPane, 2, 0d, 0d, 0d, null);
+        setAnchorToChild(controlPane, 0, 0d, ge.getProps().getLeftSidePaneWidth(), 0d, 0d);
+        setAnchorToChild(controlPane, 1, 0d, ge.getProps().getRightSidePaneWidth(),
+                0d, ge.getProps().getLeftSidePaneWidth());
+        setAnchorToChild(controlPane, 2, 0d, 0d, 0d, null);  // !kgb not nice. Reset on ImagePaneWidth change?
 
         switch (initialState) {
             case thumbnail:
@@ -73,24 +75,25 @@ public class ApplicationLayout {
         setMaxAnchorToFirstChild(ge.getMainPane());
         setMaxAnchorToFirstChild(centralPane);
 
-        // !kgb set clip rectangle to center pane!  e.g. https://stackoverflow.com/questions/15920680/how-to-restrict-visibility-of-items
+        Rectangle clipRect = new Rectangle();
+        clipRect.widthProperty().bind(centralPane.widthProperty());
+        clipRect.heightProperty().bind(centralPane.heightProperty());
+        centralPane.setClip(clipRect);
 
     }
 
     private void setMaxAnchorToFirstChild(Pane pane) {
-        setMaxAnchorToChild(pane, 0, 0d,0d, 0d, 0d);
+        setAnchorToChild(pane, 0, 0d, 0d, 0d, 0d);
     }
 
-    private void setMaxAnchorToChild(Pane pane, int child, Double top, Double right, Double bottom, Double left) {
-        if (pane instanceof AnchorPane) {
-            AnchorPane ap = (AnchorPane)pane;
-            Node n = ap.getChildren().get(child);
-            if (n != null) {
-                ap.setBottomAnchor(n, bottom);
-                ap.setTopAnchor(n, top);
-                ap.setLeftAnchor(n, left);
-                ap.setRightAnchor(n, right);
-            }
+    @SuppressWarnings("SameParameterValue")
+    private void setAnchorToChild(Pane pane, int child, Double top, Double right, Double bottom, Double left) {
+        Node n = pane.getChildren().get(child);
+        if (n != null) {
+            AnchorPane.setBottomAnchor(n, bottom);
+            AnchorPane.setTopAnchor(n, top);
+            AnchorPane.setLeftAnchor(n, left);
+            AnchorPane.setRightAnchor(n, right);
         }
     }
 
@@ -102,7 +105,9 @@ public class ApplicationLayout {
         if (state == State.imageOnly) {
             return ge.getMainPane().getWidth();
         }
-        return Math.max (0, ge.getMainPane().getWidth() - 100);  // !kgb make 100, 50 to variables
+        return Math.max(0, ge.getMainPane().getWidth()
+                - ge.getProps().getLeftSidePaneWidth()
+                - ge.getProps().getRightSidePaneWidth());
     }
 
     public void setImagePaneSizeListener(Runnable r) {
