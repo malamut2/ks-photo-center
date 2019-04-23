@@ -123,9 +123,8 @@ public class GroupedCacheLoader<K,V> {
     }
 
     public void inspectFuture(Future<V> future) {
-        new Thread(() -> {
-            System.out.println("Inspected: " + future.toString());
-        }, "GroupedCacheLoader-Inspector").start();
+        new Thread(() -> System.out.println("Inspected: " + future.toString()),
+                "GroupedCacheLoader-Inspector").start();
     }
 
     private static class MyThreadFactory implements ThreadFactory {

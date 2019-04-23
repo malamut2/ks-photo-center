@@ -75,12 +75,10 @@ public class Library {
 
     private View currentView = View.DirsFlat;
 
-    public Library(GlobalElements ge, Pane parent) {
+    public Library(GlobalElements ge) {
 
         this.ge = ge;
         library = new BorderPane();
-        VBox.setVgrow(library, Priority.ALWAYS);
-        parent.getChildren().add(library);
         library.setBackground(new Background(new BackgroundFill(Color.web("d0d0d0"), null, null)));
 
         selector = createSelector();
@@ -98,6 +96,10 @@ public class Library {
         db = new LibraryDB(ge);
         initDB();
 
+    }
+
+    public Node getPane() {
+        return library;
     }
 
     private static ComboBox<View> createSelector() {

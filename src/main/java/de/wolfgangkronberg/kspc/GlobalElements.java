@@ -85,4 +85,9 @@ public class GlobalElements {
      */
     private Library library;
 
+    /**
+     * The filesystem which displays the directory structure relative to the current image
+     */
+    private Filesystem filesystem;
+
 }

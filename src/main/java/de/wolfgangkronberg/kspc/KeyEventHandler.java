@@ -118,8 +118,8 @@ public class KeyEventHandler implements EventHandler<KeyEvent> {
 
     public void handle(KeyEvent key) {
         ge.getImagePaneMessage().stop();
-        KeyHandleSequence sequemce = new KeyHandleSequence(key);
-        sequemce.handle();
+        KeyHandleSequence sequence = new KeyHandleSequence(key);
+        sequence.handle();
     }
 
     private void handleEnter() {

@@ -137,8 +137,15 @@ public class ApplicationLayout {
     }
 
     private Pane createLeftPane() {
-        VBox result = new VBox();
-        ge.setLibrary(new Library(ge, result));
+        RowConstraints rc = new RowConstraints();
+        rc.setPercentHeight(50d);
+        GridPane result = new GridPane();
+        ge.setLibrary(new Library(ge));
+        result.add(ge.getLibrary().getPane(), 0, 0);
+        result.getRowConstraints().add(rc);
+        ge.setFilesystem(new Filesystem(ge));
+        result.add(ge.getFilesystem().getPane(), 0, 1);
+        result.getRowConstraints().add(rc);
         return result;
     }
 

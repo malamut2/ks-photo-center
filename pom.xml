@@ -8,38 +8,64 @@
     <packaging>jar</packaging>
 
     <properties>
+
+        <!-- Java language version -->
         <maven.compiler.source>12</maven.compiler.source>
         <maven.compiler.target>12</maven.compiler.target>
+
+        <!-- Encoding of our source files -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!-- Settings for the license plugin -->
+        <license.licenseName>mit</license.licenseName>
+        <project.organization.name>Wolfgang Kronberg</project.organization.name>
+        <project.inceptionYear>2019</project.inceptionYear>
+        <license.useMissingFile>true</license.useMissingFile>
+
     </properties>
+
+    <repositories> <!-- required by fontawesomefx -->
+        <repository>
+            <id>bintray-central</id>
+            <name>bintray</name>
+            <url>https://jcenter.bintray.com</url>
+        </repository>
+    </repositories>
 
     <dependencies>
 
-        <dependency>
+        <dependency> <!-- required for beautifully simple@Data annotation -->
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.18.6</version>
             <scope>provided</scope>
         </dependency>
 
-        <dependency>
+        <dependency> <!-- JavaFX, our graphics/layout engine -->
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
             <version>12</version>
         </dependency>
 
-        <dependency>
+        <dependency> <!-- H2, our embedded SQL database -->
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <version>1.4.199</version>
         </dependency>
-        <dependency>
+
+        <dependency> <!-- Accessing metadata of images, most notably JPEGs -->
             <groupId>com.drewnoakes</groupId>
             <artifactId>metadata-extractor</artifactId>
             <version>2.11.0</version>
         </dependency>
 
-        <dependency>
+        <dependency> <!-- All our nice icons -->
+            <groupId>de.jensd</groupId>
+            <artifactId>fontawesomefx-commons</artifactId>
+            <version>8.11</version>
+        </dependency>
+
+        <dependency> <!-- Standard Unit Test engine -->
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
             <version>5.4.2</version>
@@ -57,7 +83,7 @@
     <build>
         <plugins>
 
-            <plugin>
+            <plugin> <!-- Activate compiler warnings on unchecked operations -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.0</version>
@@ -68,7 +94,7 @@
                 </configuration>
             </plugin>
 
-            <plugin>
+            <plugin> <!-- Create a fully self-contained jar with all dependencies -->
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <executions>
@@ -84,7 +110,7 @@
                 </executions>
             </plugin>
 
-            <plugin>
+            <plugin> <!-- Create a custom, minimal JVM package -->
                 <groupId>com.igormaznitsa</groupId>
                 <artifactId>mvn-jlink-wrapper</artifactId>
                 <version>1.0.2</version>
@@ -116,6 +142,26 @@
                                 <option>--strip-debug</option>
                             </options>
                         </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin> <!-- Provide third-party license information -->
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <version>1.20</version>
+                <executions>
+                    <execution>
+                        <id>add-third-party</id>
+                        <goals>
+                            <goal>add-third-party</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>update-project-license</id>
+                        <goals>
+                            <goal>update-project-license</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
