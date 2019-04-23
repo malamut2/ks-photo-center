@@ -19,7 +19,7 @@ public class AppProperties {
     /**
      * The directory in which we store application-wide information, e.g. the image library
      */
-    private File home = new File(System.getProperty("user.home"), ".ksPhotoCenter");
+    private File home = new File(System.getProperty("user.home"), ".kspc");
 
     /**
      * The file from which we read the properties defined in this class on startup
