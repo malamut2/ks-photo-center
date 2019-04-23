@@ -53,7 +53,8 @@ public class ApplicationLayout {
         ge.setCentralPaneMessage(new TimedMessage(Pos.CENTER));
         centralPane.getChildren().add(ge.getCentralPaneMessage().getRoot());
         controlPane.getChildren().addAll(createLeftPane(), centralPane, createRightPane());
-        setAnchorToChild(controlPane, 0, 0d, ge.getProps().getLeftSidePaneWidth(), 0d, 0d);
+        setLeftPaneAnchor();
+        controlPane.widthProperty().addListener((a, b, c) -> setLeftPaneAnchor());
         setAnchorToChild(controlPane, 1, 0d, ge.getProps().getRightSidePaneWidth(),
                 0d, ge.getProps().getLeftSidePaneWidth());
         setRightPaneAnchor();
@@ -84,8 +85,13 @@ public class ApplicationLayout {
     }
 
     private void setRightPaneAnchor() {
-        double leftDist = Math.max(0d, controlPane.getWidth() - ge.getProps().getRightSidePaneWidth());
+        double leftDist = Math.max(0d, controlPane.getWidth() - ge.getProps().getLeftSidePaneWidth());
         setAnchorToChild(controlPane, 2, 0d, 0d, 0d, leftDist);
+    }
+
+    private void setLeftPaneAnchor() {
+        double rightDist = Math.max(0d, controlPane.getWidth() - ge.getProps().getRightSidePaneWidth());
+        setAnchorToChild(controlPane, 0, 0d, rightDist, 0d, 0d);
     }
 
     private void setMaxAnchorToFirstChild(Pane pane) {
@@ -131,11 +137,7 @@ public class ApplicationLayout {
 
     private Pane createLeftPane() {
         VBox result = new VBox();
-        result.getChildren().addAll(
-                new Label("Future Feature: Library"),
-                new Label("Future feature: Collections"),
-                new Label("Future Feature: Filesystem")
-        );
+        ge.setLibrary(new Library(ge, result));
         return result;
     }
 

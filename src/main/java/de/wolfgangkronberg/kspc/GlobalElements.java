@@ -79,4 +79,9 @@ public class GlobalElements {
      */
     private GroupedCacheLoader<File, ImageWithMetadata> imageCache;
 
+    /**
+     * The library which contains metadata on images which have been added to it
+     */
+    private Library library;
+
 }

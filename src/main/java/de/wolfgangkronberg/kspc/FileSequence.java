@@ -1,5 +1,6 @@
 package de.wolfgangkronberg.kspc;
 
+import de.wolfgangkronberg.kspc.filescanner.LibraryFlatFileScanner;
 import de.wolfgangkronberg.kspc.filescanner.FileScanner;
 import de.wolfgangkronberg.kspc.filescanner.LibraryPerDirFileScanner;
 import de.wolfgangkronberg.kspc.filescanner.SimpleFileScanner;
@@ -26,8 +27,11 @@ public class FileSequence {
             case LibraryByTimePerDir:
                 fileScanner = new LibraryPerDirFileScanner(startingPoint, fileScanSize);
                 break;
+            case LibraryByTimeFlat:
+                fileScanner = new LibraryFlatFileScanner(startingPoint, fileScanSize);
+                break;
             default:
-                throw new RuntimeException("Strategy not yet implemented: " + navStrategy.name());
+                throw new RuntimeException("Unknown Strategy: " + navStrategy.name());
         }
         fileScanner.start(null);
     }
@@ -55,7 +59,6 @@ public class FileSequence {
     public List<File> getPrevious(int num) {
         return fileScanner.getPrevious(num);
     }
-
 
     public void setCurrent(File newFile) {
         fileScanner.setCurrent(newFile);
