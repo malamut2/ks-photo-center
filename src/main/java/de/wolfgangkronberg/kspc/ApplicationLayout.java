@@ -86,12 +86,12 @@ public class ApplicationLayout {
     }
 
     private void setRightPaneAnchor() {
-        double leftDist = Math.max(0d, controlPane.getWidth() - ge.getProps().getLeftSidePaneWidth());
+        double leftDist = Math.max(0d, controlPane.getWidth() - ge.getProps().getRightSidePaneWidth());
         setAnchorToChild(controlPane, 2, 0d, 0d, 0d, leftDist);
     }
 
     private void setLeftPaneAnchor() {
-        double rightDist = Math.max(0d, controlPane.getWidth() - ge.getProps().getRightSidePaneWidth());
+        double rightDist = Math.max(0d, controlPane.getWidth() - ge.getProps().getLeftSidePaneWidth());
         setAnchorToChild(controlPane, 0, 0d, rightDist, 0d, 0d);
     }
 

@@ -73,7 +73,7 @@ public class AppProperties {
     /**
      * The width of the side pane left to the image/thumbnail pane, in pixels
      */
-    private double leftSidePaneWidth = 200d;
+    private double leftSidePaneWidth = 300d;
 
     /**
      * The width of the side pane right to the image/thumbnail pane, in pixels
