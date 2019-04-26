@@ -1,5 +1,6 @@
 package de.wolfgangkronberg.kspc;
 
+import de.wolfgangkronberg.kspc.files.NavigationStrategy;
 import lombok.Data;
 
 import java.awt.*;

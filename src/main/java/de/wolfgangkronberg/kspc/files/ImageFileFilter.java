@@ -10,6 +10,9 @@ public class ImageFileFilter implements FileFilter {
 
     @Override
     public boolean accept(File file) {
+        if (!file.isFile()) {
+            return false;
+        }
         String name = file.getName();
         int idx = name.lastIndexOf('.');
         if (idx >= 0) {

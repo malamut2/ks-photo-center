@@ -6,11 +6,14 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+/**
+ * Traverses files within a single directory.
+ */
 public class SimpleFileScanner implements FileScanner {
 
-    private final Object lock = new Object();
     private final Comparator<File> comparator;
 
+    private final Object lock = new Object();
     private File startingPoint;
     private boolean ready = false;
     private int cursor;
@@ -23,7 +26,7 @@ public class SimpleFileScanner implements FileScanner {
 
     @Override
     public void start(Runnable callback) {
-        new Thread(new ScanDirRunnable(callback), "FileScanner-Initial").start();
+        new Thread(new ScanDirRunnable(callback), "SimpleFileScanner-Initial").start();
     }
 
     @Override

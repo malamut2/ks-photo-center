@@ -1,7 +1,6 @@
 package de.wolfgangkronberg.kspc.files;
 
 import de.wolfgangkronberg.kspc.AppProperties;
-import de.wolfgangkronberg.kspc.NavigationStrategy;
 
 import java.io.File;
 import java.util.List;
