@@ -1,6 +1,8 @@
 package de.wolfgangkronberg.kspc.files;
 
 import de.wolfgangkronberg.kspc.GlobalElements;
+import javafx.collections.ObservableList;
+import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.layout.*;
@@ -16,6 +18,7 @@ import java.util.stream.Collectors;
 public class Filesystem {
 
     private final TreeView<File> treeView;
+    private TreeItem<File> treeRoot;
 
     public Filesystem(GlobalElements ge) {
 
@@ -25,7 +28,6 @@ public class Filesystem {
         }
         List<TreeItem<File>> treeRoots = files2treeItems(ge, roots);
         treeView = new TreeView<>();
-        TreeItem<File> treeRoot;
         if (treeRoots.size() > 1) {
             treeRoot = new TreeItem<>(new File("This PC"));
             treeRoot.getChildren().addAll(treeRoots);
@@ -36,7 +38,52 @@ public class Filesystem {
 
         treeView.setRoot(treeRoot);
         treeView.setBackground(new Background(new BackgroundFill(Color.web("d0d0d0"), null, null)));
+        select(ge.getCurrentImage());
 
+    }
+
+    private void select(File current) {
+        if (current == null) {
+            return;
+        }
+        LinkedList<File> dirChain = new LinkedList<>();
+        File dir = current.getParentFile();
+        while (dir != null) {
+            dirChain.addFirst(dir);
+            dir = dir.getParentFile();
+        }
+        TreeItem<File> treeItem = treeRoot;
+        for (File dirPart : dirChain) {
+            if (dirPart.equals(treeItem.getValue())) {
+                continue;
+            }
+            TreeItem<File> childItem = findChild(dirPart, treeItem);
+            if (childItem == null) {
+                System.err.println("Did not find directory structure in tree: " + current.getAbsolutePath());
+                return;
+            }
+            treeItem = childItem;
+        }
+        selectInView(treeItem);
+    }
+
+    private TreeItem<File> findChild(File dirPart, TreeItem<File> treeItem) {
+        ObservableList<TreeItem<File>> treeItems = treeItem.getChildren();
+        for (TreeItem<File> childItem : treeItems) {
+            if (dirPart.equals(childItem.getValue())) {
+                childItem.setExpanded(true);
+                return childItem;
+            }
+        }
+        return null;
+    }
+
+    private void selectInView(TreeItem<File> item) {
+        MultipleSelectionModel selectionModel = treeView.getSelectionModel();
+        int row = treeView.getRow(item);
+        if (row >= 0) {
+            selectionModel.select(row);
+        }
     }
 
     public static List<TreeItem<File>> files2treeItems(GlobalElements ge, File[] fileArray) {

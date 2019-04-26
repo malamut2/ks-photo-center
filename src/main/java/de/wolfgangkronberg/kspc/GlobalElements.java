@@ -35,7 +35,7 @@ public class GlobalElements {
     /**
      * Navigates through our images
      */
-    private Navigator navigator = new Navigator(this);
+    private Navigator navigator;
 
     /**
      * The application pane. Has exactly one child, either imagePane or controlPane

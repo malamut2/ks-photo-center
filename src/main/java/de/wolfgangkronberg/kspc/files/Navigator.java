@@ -30,6 +30,10 @@ public class Navigator {
 
     public Navigator(GlobalElements ge) {
         this.ge = ge;
+        AppProperties props = ge.getProps();
+        numPrefetchedAroundCurrent = props.getNumPrefetchAroundCurrent();
+        libraryStrategy = props.getLibraryNavStrategy();
+        filesystemStrategy = props.getFilesystemNavStrategy();
     }
 
     /**
@@ -41,10 +45,6 @@ public class Navigator {
         File current = ge.getCurrentImage();
         pane = ge.getImagePane();
         message = ge.getImagePaneMessage();
-        numPrefetchedAroundCurrent = props.getNumPrefetchAroundCurrent();
-
-        libraryStrategy = props.getLibraryNavStrategy();
-        filesystemStrategy = props.getFilesystemNavStrategy();
         NavigationStrategy currentStrategy = current == null && !ge.getLibrary().isEmpty() ?
                 libraryStrategy : filesystemStrategy;
         files = new FileSequence(props, currentStrategy, current);

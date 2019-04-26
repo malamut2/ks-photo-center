@@ -17,11 +17,17 @@ import java.util.concurrent.Executors;
 class FileTreeItem extends TreeItem<File> {
 
     private static final ImageFileFilter imageFilter = new ImageFileFilter();
-    private static final Comparator<File> alphabeticalComparator =
-            new DirectoryFirstComparator(new AlphabeticalComparator());
-    private static final Comparator<File> timeComparator = new DirectoryFirstComparator(new TimeComparator());
+    private static final Comparator<File> alphabeticalComparator = new AlphabeticalComparator();
+    private static final Comparator<File> alphabeticalFileComparator =
+            new DirectoryFirstComparator(alphabeticalComparator);
+    private static final Comparator<File> timeComparator = new TimeComparator();
+    private static final Comparator<File> timeFileComparator = new DirectoryFirstComparator(timeComparator);
     private static final ExecutorService executor =
-            Executors.newSingleThreadExecutor(r -> new Thread(r, "FileTree-Scanner"));
+            Executors.newSingleThreadExecutor(r -> {
+                Thread result = new Thread(r, "FileTree-Scanner");
+                result.setDaemon(true);
+                return result;
+            });
 
     private final long cacheTime = 5000;
     private final GlobalElements ge;
@@ -119,17 +125,30 @@ class FileTreeItem extends TreeItem<File> {
         }
     }
 
-    private File[] getFileList(File root) {
-        File[] result = root.listFiles((f) ->
-                !f.isHidden() && (f.isDirectory() || (f.isFile() && imageFilter.accept(f))));
+    private File[] getList(File root, File[] result, Comparator<File> ac, Comparator<File> tc) {
+        if (result == null) {
+            System.err.println("Could not scan directory: " + root.getAbsolutePath());
+            return new File[0];
+        }
         boolean alphabetical = ge.getNavigator().getCurrentFilesystemStrategy().isAlphabetical();
-        Comparator<File> comparator = alphabetical ? alphabeticalComparator : timeComparator;
-        // !kgb sort by alphabet/time, with dirs in front
+        Comparator<File> comparator = alphabetical ? ac : tc;
+        Arrays.sort(result, comparator);
         return result;
     }
 
+    private File[] getDirAndFileList(File root) {
+        File[] result = root.listFiles((f) ->
+                !f.isHidden() && (f.isDirectory() || (f.isFile() && imageFilter.accept(f))));
+        return getList(root, result, alphabeticalFileComparator, timeFileComparator);
+    }
+
+    private File[] getDirList(File root) {
+        File[] result = root.listFiles((f) -> !f.isHidden() && f.isDirectory());
+        return getList(root, result, alphabeticalComparator, timeComparator);
+    }
+
     private List<TreeItem<File>> scanChildren() {
-        File[] children = getFileList(getValue());
+        File[] children = getDirList(getValue());
         if (children == null) {
             children = new File[0];
         }

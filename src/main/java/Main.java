@@ -7,6 +7,12 @@ import javafx.application.Application;
 public class Main {
 
     public static void main(String[] args) {
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread t, Throwable e) {
+                System.err.println("Uncaught exception occurred: " + e.toString());
+            }
+        });
         Application.launch(App.class, args);
     }
 

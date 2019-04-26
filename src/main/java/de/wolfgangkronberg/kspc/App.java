@@ -1,5 +1,6 @@
 package de.wolfgangkronberg.kspc;
 
+import de.wolfgangkronberg.kspc.files.Navigator;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -28,6 +29,7 @@ public class App extends Application {
     public void start(Stage stage) {
         setCommandlineParams();
         AppProperties props = ge.getProps();
+        ge.setNavigator(new Navigator(ge));
         File current = currentPictureName == null ? null : new File(currentPictureName);
         ge.setCurrentImage(current);
         ge.setImageCache(new GroupedCacheLoader<>((f) -> new ImageWithMetadata(ge, f),
