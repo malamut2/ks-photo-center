@@ -84,4 +84,7 @@ public class LibraryDB {
         return DriverManager.getConnection(url, user, password);
     }
 
+    public boolean isEmpty() {
+        return true; // !kgb
+    }
 }

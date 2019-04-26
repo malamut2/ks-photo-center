@@ -1,10 +1,14 @@
-package de.wolfgangkronberg.kspc.filescanner;
+package de.wolfgangkronberg.kspc.files;
 
 import java.io.File;
 import java.text.Collator;
 import java.util.Comparator;
 
-class AlphabeticalComparator implements Comparator<File> {
+/**
+ * Sorts alphabetically by filename, according to user's default language. On equality, uses fallbacks to achieve
+ * unique sorting on all files which are not equal.
+ */
+public class AlphabeticalComparator implements Comparator<File> {
 
     private final Collator coll = Collator.getInstance();
 
@@ -15,6 +19,9 @@ class AlphabeticalComparator implements Comparator<File> {
         int result = coll.compare(name1, name2);
         if (result == 0) {
             result = name1.compareTo(name2);
+        }
+        if (result == 0) {
+            result = f1.compareTo(f2);
         }
         return result;
     }

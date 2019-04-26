@@ -27,22 +27,16 @@ public class AppProperties {
     private File props = new File(home, "app.properties");
 
     /**
-     * The Navigation strategy which is applied if the app is opened without specifying any image file as a
-     * command line parameter
+     * The Navigation strategy which is applied for traversing through the library. This will be used initially
+     * if the library is not empty, and the app is opened without specifying any image file as a command line parameter.
      */
-    private NavigationStrategy defaultNavStrategy = NavigationStrategy.LibraryByTimePerDir;
+    private NavigationStrategy libraryNavStrategy = NavigationStrategy.LibraryByTimePerDir;
 
     /**
-     * The Navigation strategy which is applied if the app is opened with a specific image file specified as a
-     * command line parameter
+     * The Navigation strategy which is applied for traversing through the file system. this will be used initially
+     * if the lib´rary is empty, or the app is opened with a specific image file specified as a command line parameter.
      */
-    private NavigationStrategy openFileNavStrategy = NavigationStrategy.TraverseTreeAlphabetical;
-
-    /**
-     * The Navigation strategy which is applied if the currently active strategy is invalid, e.g. because our
-     * current image is not in the library, but a library-type strategy is chosen
-     */
-    private NavigationStrategy failoverNavStrategy = NavigationStrategy.TraverseTreeAlphabetical;
+    private NavigationStrategy filesystemNavStrategy = NavigationStrategy.TraverseTreeAlphabetical;
 
     /**
      * The width of the main window on startup, in pixels

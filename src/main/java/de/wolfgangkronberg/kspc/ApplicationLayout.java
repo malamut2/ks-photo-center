@@ -1,5 +1,6 @@
 package de.wolfgangkronberg.kspc;
 
+import de.wolfgangkronberg.kspc.files.Filesystem;
 import de.wolfgangkronberg.kspc.library.Library;
 import javafx.geometry.Pos;
 import javafx.scene.Node;

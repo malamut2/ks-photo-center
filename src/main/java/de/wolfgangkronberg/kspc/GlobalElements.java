@@ -1,6 +1,8 @@
 package de.wolfgangkronberg.kspc;
 
 import de.wolfgangkronberg.kspc.edit.EditAction;
+import de.wolfgangkronberg.kspc.files.Filesystem;
+import de.wolfgangkronberg.kspc.files.Navigator;
 import de.wolfgangkronberg.kspc.library.Library;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;

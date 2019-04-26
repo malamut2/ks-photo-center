@@ -1,4 +1,4 @@
-package de.wolfgangkronberg.kspc.filescanner;
+package de.wolfgangkronberg.kspc.files;
 
 import java.io.File;
 import java.util.Arrays;

@@ -93,13 +93,17 @@ public class Library {
         library.setTop(selector);
 
         library.setCenter(new Label("Initializing Library..."));
-        db = new LibraryDB(ge);
+        db = new LibraryDB(ge);  // !kgb do lazy init: only when db is needed (e.g. when pane is shown)
         initDB();
 
     }
 
     public Node getPane() {
         return library;
+    }
+
+    public boolean isEmpty() {
+        return db.isEmpty();
     }
 
     private static ComboBox<View> createSelector() {

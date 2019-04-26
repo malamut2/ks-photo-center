@@ -1,6 +1,6 @@
-package de.wolfgangkronberg.kspc;
+package de.wolfgangkronberg.kspc.files;
 
-import de.wolfgangkronberg.kspc.filescanner.FileCache;
+import de.wolfgangkronberg.kspc.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 
@@ -16,12 +16,15 @@ import java.util.concurrent.TimeoutException;
 public class Navigator {
 
     private final GlobalElements ge;
+
     private Pane pane;
     private double paneHeight;
     private double paneWidth;
     private int numPrefetchedAroundCurrent;
     private TimedMessage message;
 
+    private NavigationStrategy libraryStrategy;
+    private NavigationStrategy filesystemStrategy;
     private FileSequence files;
     private FileCache<ImageWithMetadata> fCache;
 
@@ -33,13 +36,18 @@ public class Navigator {
      * Initialized the Navigator by setting the initial picture which shall be viewed.
      */
     public void init() {
+
         AppProperties props = ge.getProps();
         File current = ge.getCurrentImage();
         pane = ge.getImagePane();
         message = ge.getImagePaneMessage();
         numPrefetchedAroundCurrent = props.getNumPrefetchAroundCurrent();
-        files = new FileSequence(props,
-                current == null ? props.getDefaultNavStrategy() : props.getOpenFileNavStrategy(), current);
+
+        libraryStrategy = props.getLibraryNavStrategy();
+        filesystemStrategy = props.getFilesystemNavStrategy();
+        NavigationStrategy currentStrategy = current == null && !ge.getLibrary().isEmpty() ?
+                libraryStrategy : filesystemStrategy;
+        files = new FileSequence(props, currentStrategy, current);
         fCache = new FileCache<>(files, ge.getImageCache());
 
         ApplicationLayout appLayout = ge.getApplicationLayout();
@@ -107,6 +115,10 @@ public class Navigator {
         ge.setCurrentImage(current);
         ImageView iv = iwm.getImageView(paneWidth, paneHeight);
         pane.getChildren().set(0, iv);
+    }
+
+    public NavigationStrategy getCurrentFilesystemStrategy() {
+        return filesystemStrategy;
     }
 
 }

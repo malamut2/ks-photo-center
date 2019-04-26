@@ -1,6 +1,5 @@
-package de.wolfgangkronberg.kspc.filescanner;
+package de.wolfgangkronberg.kspc.files;
 
-import de.wolfgangkronberg.kspc.FileSequence;
 import de.wolfgangkronberg.kspc.GroupedCacheLoader;
 
 import java.io.File;

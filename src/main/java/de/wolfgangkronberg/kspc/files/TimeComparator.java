@@ -1,9 +1,12 @@
-package de.wolfgangkronberg.kspc.filescanner;
+package de.wolfgangkronberg.kspc.files;
 
 import java.io.File;
 import java.util.Comparator;
 
-class TimeComparator implements Comparator<File> {
+/**
+ * Sorts descending by file modification time. On equal time, falls back to alphabetical sorting.
+ */
+public class TimeComparator implements Comparator<File> {
 
     private final Comparator<File> fallback = new AlphabeticalComparator();
 
