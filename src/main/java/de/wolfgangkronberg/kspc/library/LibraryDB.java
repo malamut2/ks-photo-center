@@ -37,7 +37,11 @@ public class LibraryDB {
                     }
                     break;
             }
-            System.out.println("Using existing database with DB version " + version);
+            if (version == 0) {
+                System.out.println("Created new database with DB version " + getDBVersion(conn));
+            } else {
+                System.out.println("Using existing database with DB version " + version);
+            }
             scanDB(conn);
         } catch (SQLException e) {
             System.err.println("Could not access library database: " + e.toString() + ". Exiting.");

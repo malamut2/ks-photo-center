@@ -143,7 +143,7 @@ class FileTreeItem extends TreeItem<File> {
     }
 
     private File[] getDirList(File root) {
-        File[] result = root.listFiles((f) -> !f.isHidden() && f.isDirectory());
+        File[] result = root.listFiles(FileTreeItem::shouldShowInTree);
         return getList(root, result, alphabeticalComparator, timeComparator);
     }
 
@@ -196,12 +196,24 @@ class FileTreeItem extends TreeItem<File> {
             return false;
         }
         try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(dir.toPath())) {
-            return dirStream.iterator().hasNext();
+            for (Path path : dirStream) {
+                File file = path.toFile();
+                if (shouldShowInTree(file)) {
+                    return true;
+                }
+            }
+            return false;
         } catch (IOException e) {
             return false;
         }
     }
 
+    private static boolean shouldShowInTree(File file) {
+        return file.isDirectory() && !file.isHidden();
+    }
+
+    // !kgb check what happens if the user opens a hidden file,
+    //  and a file where any directory in the structure is hidden
 
     @Override
     public boolean equals(Object o) {
