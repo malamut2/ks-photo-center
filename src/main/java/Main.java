@@ -11,6 +11,7 @@ public class Main {
             @Override
             public void uncaughtException(Thread t, Throwable e) {
                 System.err.println("Uncaught exception occurred: " + e.toString());
+                e.printStackTrace();
             }
         });
         Application.launch(App.class, args);
