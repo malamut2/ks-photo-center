@@ -69,8 +69,8 @@ public class SimpleFileScanner implements FileScanner {
     public List<File> getNext(int num) {
         synchronized (lock) {
             waitForReady();
-            int to = Math.min(cursor + num, files.length);
-            return Collections.unmodifiableList(Arrays.asList(files).subList(cursor, to));
+            int to = Math.min(cursor + num + 1, files.length);
+            return Collections.unmodifiableList(Arrays.asList(files).subList(cursor + 1, to));
         }
     }
 

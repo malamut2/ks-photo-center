@@ -7,6 +7,11 @@ import javafx.application.Application;
 public class Main {
 
     public static void main(String[] args) {
+        reportExceptions();
+        Application.launch(App.class, args);
+    }
+
+    private static void reportExceptions() {
         Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
             @Override
             public void uncaughtException(Thread t, Throwable e) {
@@ -14,7 +19,6 @@ public class Main {
                 e.printStackTrace();
             }
         });
-        Application.launch(App.class, args);
     }
 
 }

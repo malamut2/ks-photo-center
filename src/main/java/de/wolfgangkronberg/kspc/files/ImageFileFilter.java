@@ -6,7 +6,7 @@ import java.util.Set;
 
 public class ImageFileFilter implements FileFilter {
 
-    private final Set<String> allowed = Set.of("jpg", "jpeg", "gif", "png", "bmp");
+    public static final Set<String> allowed = Set.of("jpg", "jpeg", "gif", "png", "bmp");
 
     @Override
     public boolean accept(File file) {
