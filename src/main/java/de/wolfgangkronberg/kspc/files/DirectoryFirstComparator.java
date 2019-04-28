@@ -16,8 +16,8 @@ public class DirectoryFirstComparator implements Comparator<File> {
 
     @Override
     public int compare(File f1, File f2) {
-        boolean d1 = f1.isDirectory();
-        boolean d2 = f2.isDirectory();
+        boolean d1 = isDirectory(f1);
+        boolean d2 = isDirectory(f2);
         if (d1 && !d2) {
             return -1;
         }
@@ -26,4 +26,13 @@ public class DirectoryFirstComparator implements Comparator<File> {
         }
         return fallback.compare(f1, f2);
     }
+
+    private boolean isDirectory(File f) {
+        try {
+            return f.isDirectory();
+        } catch (SecurityException ignored) {
+            return false;
+        }
+    }
+
 }

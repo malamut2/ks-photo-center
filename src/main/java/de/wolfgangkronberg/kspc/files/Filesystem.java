@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 public class Filesystem {
 
     private final TreeView<File> treeView;
-    private TreeItem<File> treeRoot;
+    private final TreeItem<File> treeRoot;
 
     public Filesystem(GlobalElements ge) {
 

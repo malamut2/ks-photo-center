@@ -12,7 +12,7 @@ public class TimeComparator implements Comparator<File> {
 
     @Override
     public int compare(File f1, File f2) {
-        long result = f2.lastModified() - f1.lastModified();
+        long result = lastModified(f2) - lastModified(f1);
         if (result < 0) {
             return -1;
         }
@@ -21,4 +21,13 @@ public class TimeComparator implements Comparator<File> {
         }
         return fallback.compare(f1, f2);
     }
+
+    private long lastModified(File f) {
+        try {
+            return f.lastModified();
+        } catch (SecurityException ignored) {
+            return 0;
+        }
+    }
+
 }

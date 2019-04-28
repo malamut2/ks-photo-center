@@ -12,12 +12,9 @@ public class Main {
     }
 
     private static void reportExceptions() {
-        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-            @Override
-            public void uncaughtException(Thread t, Throwable e) {
-                System.err.println("Uncaught exception occurred: " + e.toString());
-                e.printStackTrace();
-            }
+        Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
+            System.err.println("Uncaught exception occurred: " + e.toString());
+            e.printStackTrace();
         });
     }
 

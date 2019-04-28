@@ -35,7 +35,7 @@ public class AppProperties {
 
     /**
      * The Navigation strategy which is applied for traversing through the file system. this will be used initially
-     * if the lib´rary is empty, or the app is opened with a specific image file specified as a command line parameter.
+     * if the library is empty, or the app is opened with a specific image file specified as a command line parameter.
      */
     private NavigationStrategy filesystemNavStrategy = NavigationStrategy.TraverseTreeAlphabetical;
 

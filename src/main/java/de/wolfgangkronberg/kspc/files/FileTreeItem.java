@@ -136,12 +136,6 @@ class FileTreeItem extends TreeItem<File> {
         return result;
     }
 
-    private File[] getDirAndFileList(File root) {
-        File[] result = root.listFiles((f) ->
-                !f.isHidden() && (f.isDirectory() || (f.isFile() && imageFilter.accept(f))));
-        return getList(root, result, alphabeticalFileComparator, timeFileComparator);
-    }
-
     private File[] getDirList(File root) {
         File[] result = root.listFiles(FileTreeItem::shouldShowInTree);
         return getList(root, result, alphabeticalComparator, timeComparator);
