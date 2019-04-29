@@ -13,7 +13,7 @@ public class Main {
 
     private static void reportExceptions() {
         Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
-            System.err.println("Uncaught exception occurred: " + e.toString());
+            System.err.println("Internal error: " + e.toString());
             e.printStackTrace();
         });
     }

@@ -64,16 +64,16 @@ public class Filesystem {
                 childItem = new FileTreeItem(ge, dirPart);
                 ((FileTreeItem)treeItem).addPermanently(childItem);
             }
+            treeItem.setExpanded(true);  // !kgb not here! save into list & run in Platform.runLater()
             treeItem = childItem;
         }
-        selectInView(treeItem);
+        selectInView(treeItem);  // !kgb append to Platform.runLater() after all the expands
     }
 
     private TreeItem<File> findChild(File dirPart, TreeItem<File> treeItem) {
         ObservableList<TreeItem<File>> treeItems = treeItem.getChildren();
         for (TreeItem<File> childItem : treeItems) {
             if (dirPart.equals(childItem.getValue())) {
-                childItem.setExpanded(true);
                 return childItem;
             }
         }

@@ -45,6 +45,8 @@ public class App extends Application {
         ge.setApplicationLayout(createApplicationLayout());
         ge.getNavigator().init();
         stage.show();
+        stage.toFront();
+        stage.requestFocus();
     }
 
     private ApplicationLayout createApplicationLayout() {
@@ -90,4 +92,7 @@ public class App extends Application {
         }
     }
 
+    public GlobalElements getGlobalElements() {
+        return ge;
+    }
 }

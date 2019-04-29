@@ -146,20 +146,12 @@ class FileTreeItem extends TreeItem<File> {
         }
     }
 
-    private File[] getList(File root, File[] result, Comparator<File> ac, Comparator<File> tc) {
-        if (result == null) {
-            System.err.println("Could not scan directory: " + root.getAbsolutePath());
-            return new File[0];
-        }
-        boolean alphabetical = ge.getNavigator().getCurrentFilesystemStrategy().isAlphabetical();
-        Comparator<File> comparator = alphabetical ? ac : tc;
-        Arrays.sort(result, comparator);
-        return result;
-    }
-
     private File[] getDirList(File root) {
-        File[] result = root.listFiles(this::shouldShowInTree);  // !kgb take care of SecurityException
-        return getList(root, result, alphabeticalComparator, timeComparator);
+        try {
+            return root.listFiles(this::shouldShowInTree);
+        } catch (SecurityException ignored) {
+            return null;
+        }
     }
 
     private List<TreeItem<File>> scanChildren() {
@@ -177,7 +169,17 @@ class FileTreeItem extends TreeItem<File> {
                 }
             }
         }
-        return treeItems;
+        return getList(treeItems, alphabeticalComparator, timeComparator);
+    }
+
+    private List<TreeItem<File>> getList(List<TreeItem<File>> result, Comparator<File> ac, Comparator<File> tc) {
+        if (result == null) {
+            return Collections.emptyList();
+        }
+        boolean alphabetical = ge.getNavigator().getCurrentFilesystemStrategy().isAlphabetical();
+        Comparator<File> comparator = alphabetical ? ac : tc;
+        result.sort((t1, t2) -> comparator.compare(t1.getValue(), t2.getValue()));
+        return result;
     }
 
     @Override
@@ -217,8 +219,14 @@ class FileTreeItem extends TreeItem<File> {
     }
 
     private boolean hasChildren(final File dir) {
-        if (!dir.isDirectory()) {
-            return false;
+        try {
+            if (!dir.isDirectory()) {
+                return false;
+            }
+        } catch (SecurityException ignored) {
+            synchronized (lock) {
+                return !manuallyAdded.isEmpty();
+            }
         }
         try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(dir.toPath())) {
             for (Path path : dirStream) {
