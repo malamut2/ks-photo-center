@@ -16,12 +16,8 @@ import java.util.concurrent.Executors;
 
 class FileTreeItem extends TreeItem<File> {
 
-    private static final ImageFileFilter imageFilter = new ImageFileFilter();
     private static final Comparator<File> alphabeticalComparator = new AlphabeticalComparator();
-    private static final Comparator<File> alphabeticalFileComparator =
-            new DirectoryFirstComparator(alphabeticalComparator);
     private static final Comparator<File> timeComparator = new TimeComparator();
-    private static final Comparator<File> timeFileComparator = new DirectoryFirstComparator(timeComparator);
     private static final ExecutorService executor =
             Executors.newSingleThreadExecutor(r -> {
                 Thread result = new Thread(r, "FileTree-Scanner");
@@ -32,6 +28,7 @@ class FileTreeItem extends TreeItem<File> {
     private final long cacheTime = 5000;
     private final GlobalElements ge;
     private final File file;
+    private final List<TreeItem<File>> manuallyAdded = new ArrayList<>(0);
 
     private final Object lock = new Object();
     private boolean isUpdatingChildren = false;
@@ -77,13 +74,37 @@ class FileTreeItem extends TreeItem<File> {
         return super.getChildren();
     }
 
+    /**
+     * While we generally do not traverse or show hidden or inaccessible items, we will show them when it is
+     * required. In that case, we will statically add the item, and never update that (even if the underlying
+     * file is moved or deleted).
+     * @param item the item to add permanently to this FileTree
+     */
+    public void addPermanently(TreeItem<File> item) {
+        synchronized (lock) {
+            if (!manuallyAdded.contains(item)) {
+                manuallyAdded.add(item);
+            }
+        }
+        synchronized (lock) {
+            while (!newChildren.contains(item)) {
+                try {
+                    requestChildrenUpdate();
+                    lock.wait(50);
+                } catch (InterruptedException e) {
+                    System.err.println("Interrupted while waiting for file tree item children");
+                }
+            }
+        }
+    }
+
     // caller must synchronize on lock
     private void requestChildrenUpdate() {
         if (isUpdatingChildren) {
             return;
         }
         isUpdatingChildren = true;
-        executor.submit(() -> {
+        executor.execute(() -> {
             List<TreeItem<File>> children = scanChildren();
             boolean waiting;
             synchronized (lock) {
@@ -137,7 +158,7 @@ class FileTreeItem extends TreeItem<File> {
     }
 
     private File[] getDirList(File root) {
-        File[] result = root.listFiles(FileTreeItem::shouldShowInTree);
+        File[] result = root.listFiles(this::shouldShowInTree);  // !kgb take care of SecurityException
         return getList(root, result, alphabeticalComparator, timeComparator);
     }
 
@@ -146,7 +167,17 @@ class FileTreeItem extends TreeItem<File> {
         if (children == null) {
             children = new File[0];
         }
-        return Filesystem.files2treeItems(ge, children);
+        List<TreeItem<File>> treeItems = Filesystem.files2treeItems(ge, children);
+        synchronized (lock) {
+            if (!manuallyAdded.isEmpty()) {
+                for (TreeItem<File> item : manuallyAdded) {
+                    if (!treeItems.contains(item)) {
+                        treeItems.add(item);
+                    }
+                }
+            }
+        }
+        return treeItems;
     }
 
     @Override
@@ -175,7 +206,7 @@ class FileTreeItem extends TreeItem<File> {
             return;
         }
         isUpdatingLeafProp = true;
-        executor.submit(() -> {
+        executor.execute(() -> {
             boolean leafProp = !hasChildren(file);
             synchronized (lock) {
                 isUpdatingLeafProp = false;
@@ -185,7 +216,7 @@ class FileTreeItem extends TreeItem<File> {
         });
     }
 
-    private static boolean hasChildren(final File dir) {
+    private boolean hasChildren(final File dir) {
         if (!dir.isDirectory()) {
             return false;
         }
@@ -202,8 +233,19 @@ class FileTreeItem extends TreeItem<File> {
         }
     }
 
-    private static boolean shouldShowInTree(File file) {
-        return file.isDirectory() && !file.isHidden();
+    private boolean shouldShowInTree(File file) {
+        try {
+            return file.isDirectory() && !file.isHidden();
+        } catch (SecurityException e) {
+            synchronized (lock) {
+                for (TreeItem<File> item : manuallyAdded) {
+                    if (file.equals(item.getValue())) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
     }
 
     // !kgb check what happens if the user opens a hidden file,
@@ -221,4 +263,5 @@ class FileTreeItem extends TreeItem<File> {
     public int hashCode() {
         return Objects.hash(file);
     }
+
 }

@@ -19,9 +19,11 @@ public class Filesystem {
 
     private final TreeView<File> treeView;
     private final TreeItem<File> treeRoot;
+    private final GlobalElements ge;
 
     public Filesystem(GlobalElements ge) {
 
+        this.ge = ge;
         File[] roots = File.listRoots();
         if (roots == null || roots.length == 0) {
             roots = new File[]{new File("/")};
@@ -59,8 +61,8 @@ public class Filesystem {
             }
             TreeItem<File> childItem = findChild(dirPart, treeItem);
             if (childItem == null) {
-                System.err.println("Did not find directory structure in tree: " + current.getAbsolutePath());
-                return;
+                childItem = new FileTreeItem(ge, dirPart);
+                ((FileTreeItem)treeItem).addPermanently(childItem);
             }
             treeItem = childItem;
         }

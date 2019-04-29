@@ -132,14 +132,14 @@ public class Library {
     }
 
     private void initDB() {
-        executor.submit(() -> {
+        executor.execute(() -> {
             db.init();
             showSelectedPane();
         });
     }
 
     private void showSelectedPane() {
-        executor.submit(() -> {
+        executor.execute(() -> {
             final Node pane;
             synchronized (panes) {
                 pane = panes.computeIfAbsent(currentView, this::createPane);

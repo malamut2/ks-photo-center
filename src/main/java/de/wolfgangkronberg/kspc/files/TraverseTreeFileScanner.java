@@ -38,8 +38,8 @@ public class TraverseTreeFileScanner implements FileScanner {
 
     @Override
     public void start(Runnable callback) {
-        executor.submit(new ScanDirRunnable(callback));
-        executor.submit(this::updateCacheOnNewCursor);
+        executor.execute(new ScanDirRunnable(callback));
+        executor.execute(this::updateCacheOnNewCursor);
     }
 
     // make sure that +/- fileScanSize is available
@@ -89,7 +89,7 @@ public class TraverseTreeFileScanner implements FileScanner {
         waitUntilReady();
         boolean result = cursor.move(diff) != 0;
         if (result) {
-            executor.submit(this::updateCacheOnNewCursor);
+            executor.execute(this::updateCacheOnNewCursor);
         }
         return result;
     }
@@ -113,7 +113,7 @@ public class TraverseTreeFileScanner implements FileScanner {
             setCursorToFile(cursor.get());
             previousCursor = null;
         }
-        executor.submit(this::updateCacheOnNewCursor);
+        executor.execute(this::updateCacheOnNewCursor);
     }
 
     @Override
@@ -165,7 +165,7 @@ public class TraverseTreeFileScanner implements FileScanner {
         }
         if (!Objects.equals(current, newFile)) {
             setCursorToFile(newFile);
-            executor.submit(this::updateCacheOnNewCursor);
+            executor.execute(this::updateCacheOnNewCursor);
         }
     }
 
@@ -175,9 +175,15 @@ public class TraverseTreeFileScanner implements FileScanner {
         }
     }
 
+    private DirInfo getDirInfo(File dir) {
+        synchronized (lock) {
+            return dirCache.computeIfAbsent(dir, DirInfo::new);
+        }
+    }
+
     private void setCursorToFile(File f) {
 
-        DirInfo dir = getDirInfo(f.getParentFile(), null);
+        DirInfo dir = getDirInfo(f.getParentFile());
         dir.scan();
         int idx = Arrays.binarySearch(dir.images, startingPoint, comparator);
 
@@ -194,6 +200,11 @@ public class TraverseTreeFileScanner implements FileScanner {
 
         private File[] images;
         private File[] subDirs;
+        private boolean forbidden = false;
+
+        protected DirInfo(File dir) {
+            this(dir, null);
+        }
 
         protected DirInfo(File dir, File knownSubdir) {
             this.dir = dir;
@@ -206,6 +217,9 @@ public class TraverseTreeFileScanner implements FileScanner {
                 File[] newSubDirs = sort(dir.listFiles(folderFileFilter));
                 if (newSubDirs.length == 0 && knownSubdir != null) {
                     newSubDirs = new File[]{knownSubdir};
+                    synchronized (lock) {
+                        forbidden = true;
+                    }
                 }
                 synchronized (lock) {
                     images = newImages;
@@ -215,6 +229,7 @@ public class TraverseTreeFileScanner implements FileScanner {
                 synchronized (lock) {
                     images = new File[0];
                     subDirs = knownSubdir != null ? new File[]{knownSubdir} : new File[0];
+                    forbidden = true;
                 }
             }
         }
@@ -277,6 +292,12 @@ public class TraverseTreeFileScanner implements FileScanner {
             }
             synchronized (lock) {
                 return Arrays.binarySearch(subDirs, dir, comparator);
+            }
+        }
+
+        public boolean isForbidden() {
+            synchronized (lock) {
+                return forbidden;
             }
         }
     }
@@ -367,7 +388,7 @@ public class TraverseTreeFileScanner implements FileScanner {
             DirInfo di = dir;
             while (true) {
                 while (di.getNumSubdirs() > 0) {
-                    di = getDirInfo(di.subDirs[0], null);
+                    di = getDirInfo(di.subDirs[0]);
                     if (di.getNumImages() > 0) {
                         dir = di;
                         filePos = 0;
@@ -375,6 +396,9 @@ public class TraverseTreeFileScanner implements FileScanner {
                     }
                 }
                 while (true) {
+                    if (di.isForbidden()) {
+                        return false;
+                    }
                     File parentFile = di.dir.getParentFile();
                     if (parentFile == null) {
                         return false;
@@ -382,7 +406,7 @@ public class TraverseTreeFileScanner implements FileScanner {
                     DirInfo diParent = getDirInfo(parentFile, di.dir);
                     int idx = diParent.findSubDirIndex(di.dir);
                     if (idx >= 0 && idx < diParent.getNumSubdirs() - 1) {
-                        di = getDirInfo(diParent.subDirs[idx + 1], null);
+                        di = getDirInfo(diParent.subDirs[idx + 1]);
                         if (di.getNumImages() > 0) {
                             dir = di;
                             filePos = 0;
@@ -403,6 +427,9 @@ public class TraverseTreeFileScanner implements FileScanner {
             DirInfo di = dir;
             while (true) {
                 while (true) {
+                    if (di.isForbidden()) {
+                        return false;
+                    }
                     File parentFile = di.dir.getParentFile();
                     if (parentFile == null) {
                         return false;
@@ -410,7 +437,7 @@ public class TraverseTreeFileScanner implements FileScanner {
                     DirInfo diParent = getDirInfo(parentFile, di.dir);
                     int idx = diParent.findSubDirIndex(di.dir);
                     if (idx > 0 && idx < diParent.getNumSubdirs()) {
-                        di = getDirInfo(diParent.subDirs[idx - 1], null);
+                        di = getDirInfo(diParent.subDirs[idx - 1]);
                         break;
                     }
                     if (idx == 0 && diParent.getNumImages() > 0) {
@@ -421,7 +448,7 @@ public class TraverseTreeFileScanner implements FileScanner {
                     di = diParent;
                 }
                 while (di.getNumSubdirs() > 0) {
-                    di = getDirInfo(di.subDirs[di.getNumSubdirs() - 1], null);
+                    di = getDirInfo(di.subDirs[di.getNumSubdirs() - 1]);
                     if (di.getNumImages() > 0) {
                         dir = di;
                         filePos = di.getNumImages() - 1;
